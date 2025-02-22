@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import '../../data/models.dart';
+
+class RecommendationsGrid extends StatelessWidget {
+  final List<Film> films;
+
+  const RecommendationsGrid({required this.films, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+        childAspectRatio: 2 / 3,
+      ),
+      itemCount: films.length,
+      itemBuilder: (context, index) {
+        final film = films[index];
+        return _buildGridItem(film);
+      },
+    );
+  }
+
+  Widget _buildGridItem(Film film) {
+    return Column(
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Image.network(
+              film.imageRef.isNotEmpty
+                  ? film.imageRef
+                  : 'https://via.placeholder.com/267x400',
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          film.title,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyMedium,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+}
