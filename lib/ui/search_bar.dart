@@ -1,10 +1,12 @@
+import 'package:film_rec_front/data/api_service.dart';
+import 'package:film_rec_front/state/app_state.dart';
 import 'package:flutter/material.dart';
+import '../../data/models.dart';
 import '../../data/api_service.dart';
 import '../../state/app_state.dart';
-import '../../utils/debouncer.dart';
 
 class SearchBarWidget extends StatefulWidget {
-  final MovieRepository repository;
+  final ApiService repository;
   final AppState appState;
   final Function(Film) onFilmSelected;
 
@@ -20,35 +22,49 @@ class SearchBarWidget extends StatefulWidget {
 }
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
-  final Debouncer _debouncer = Debouncer();
   final SearchController _searchController = SearchController();
 
   @override
   Widget build(BuildContext context) {
     return SearchAnchor(
-      controller: _searchController,
+      searchController: _searchController,
       builder: (context, controller) => IconButton(
         icon: const Icon(Icons.search),
         onPressed: () => controller.openView(),
       ),
       suggestionsBuilder: (context, controller) async {
-        _debouncer.run(() async {
-          final results = await widget.repository.searchMovies(controller.text);
-          widget.appState.searchResults = results;
-          setState(() {});
+        final query = controller.text.trim();
+        if (query.isEmpty) return [];
+
+        
+        final results = await widget.repository.searchFilms(query);
+        
+
+        // Use Future.microtask to ensure UI updates before returning suggestions
+        Future.microtask(() {
+          setState(() {
+            widget.appState.searchResults = results;
+          });
         });
-        return _buildSuggestions();
+
+        return _buildSuggestions(query);
       },
     );
   }
 
-  List<ListTile> _buildSuggestions() {
+  List<ListTile> _buildSuggestions(String query) {
     return widget.appState.searchResults.map((film) => ListTile(
-      title: Text(film.title),
-      onTap: () {
-        widget.onFilmSelected(film);
-        _searchController.closeView(film.title);
-      },
-    )).toList();
+          title: Text(film.title),
+          onTap: () {
+            widget.onFilmSelected(film);
+            _searchController.closeView(film.title);
+          },
+        )).toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }

@@ -6,9 +6,9 @@ class Debouncer {
 
   Debouncer({this.delay = const Duration(milliseconds: 500)});
 
-  void run(void Function() callback) {
+  void run(void Function() action) {
     _timer?.cancel();
-    _timer = Timer(delay, callback);
+    _timer = Timer(delay, action);
   }
 
   void dispose() {
