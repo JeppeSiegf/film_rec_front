@@ -1,10 +1,11 @@
+import 'package:film_rec_front/theme/theme_manager.dart';
 import 'package:flutter/material.dart';
 import '../../data/models.dart';
 import 'movie_detail_dialog.dart';
 
 class RecommendationsGrid extends StatelessWidget {
   final List<Film> films;
-  final void Function(Film) onFilmSelected; // Accept callback for film selection
+  final void Function(Film) onFilmSelected;
 
   const RecommendationsGrid({Key? key, required this.films, required this.onFilmSelected}) : super(key: key);
 
@@ -12,25 +13,7 @@ class RecommendationsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calculate the number of films per row
-        int columns = 3; // Default columns
-        double screenWidth = constraints.maxWidth;
-
-        // Adjust the number of columns based on screen width
-        if (screenWidth > 600) {
-          columns = 4;
-        }
-        if (screenWidth > 800) {
-          columns = 6;
-        }
-        if (screenWidth > 1000) {
-          columns = 12; // Maximum columns (as per your request)
-
-          // Ensure the number of films per row is divisible by 12
-          if (films.length % 12 != 0) {
-            columns = (films.length % 12 == 0) ? 12 : 6; // Adjust based on available films
-          }
-        }
+        int columns = _calculateColumns(constraints.maxWidth);
 
         return GridView.builder(
           shrinkWrap: true,
@@ -38,53 +21,90 @@ class RecommendationsGrid extends StatelessWidget {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columns,
             crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-            childAspectRatio: 2 / 3,
+            mainAxisSpacing: 0.6, // Ensures no overlap between rows
+            childAspectRatio: 0.6, // Allows space for text
           ),
           itemCount: films.length,
           itemBuilder: (context, index) {
-            final film = films[index];
-            return _buildGridItem(film, context);
+            return FilmGridItem(film: films[index], onFilmSelected: onFilmSelected);
           },
         );
       },
     );
   }
 
-  Widget _buildGridItem(Film film, BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+  int _calculateColumns(double screenWidth) {
+    if (screenWidth > 1000) return 6;
+    if (screenWidth > 800) return 5;
+    if (screenWidth > 600) return 4;
+    return 3;
+  }
+}
 
-    double resolution = screenWidth > 600
-        ? 1.5
-        : (screenWidth > 400 ? 1.0 : 0.75);
+class FilmGridItem extends StatelessWidget {
+  final Film film;
+  final void Function(Film) onFilmSelected;
 
-    return Column(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () => showFilmPopup(context, film, onFilmSelected),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(
-                film.largeImageRef.isNotEmpty
-                    ? film.largeImageRef
-                    : 'https://via.placeholder.com/267x400',
-                fit: BoxFit.cover,
-                width: 230 * resolution,
-                height: 345 * resolution,
+  const FilmGridItem({Key? key, required this.film, required this.onFilmSelected}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight( // Ensures height adjusts to fit both image and text
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded( // Ensures image takes all available space while respecting aspect ratio
+            child: GestureDetector(
+              onTap: () => showFilmPopup(context, film, onFilmSelected),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  film.largeImageRef.isNotEmpty
+                      ? film.largeImageRef
+                      : 'https://via.placeholder.com/267x400',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          film.title,
+          const SizedBox(height: 8), // Ensures spacing between image and text
+          FilmTitle(film: film),
+        ],
+      ),
+    );
+  }
+}
+
+class FilmTitle extends StatelessWidget {
+  final Film film;
+
+  const FilmTitle({Key? key, required this.film}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48, // Ensures enough space for 2 lines of text
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child:AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        child: Text(
+          LocalizationManager.locale.languageCode == 'local'
+              ? film.title
+              : film.originalTitle,
+          key: ValueKey<String>(LocalizationManager.locale.languageCode),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
+      ),
+    )));
   }
 }
+

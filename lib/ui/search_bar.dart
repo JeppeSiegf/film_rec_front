@@ -2,8 +2,7 @@ import 'package:film_rec_front/data/api_service.dart';
 import 'package:film_rec_front/state/app_state.dart';
 import 'package:flutter/material.dart';
 import '../../data/models.dart';
-import '../../data/api_service.dart';
-import '../../state/app_state.dart';
+
 
 class SearchBarWidget extends StatefulWidget {
   final ApiService repository;
@@ -37,7 +36,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         if (query.isEmpty) return [];
 
         
+        
         final results = await widget.repository.searchFilms(query);
+
         
 
         // Use Future.microtask to ensure UI updates before returning suggestions

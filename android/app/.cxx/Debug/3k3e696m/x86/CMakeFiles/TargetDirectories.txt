@@ -1,0 +1,2 @@
+C:/Users/Jeppe/vsprojects/film_rec_front/android/app/.cxx/Debug/3k3e696m/x86/CMakeFiles/edit_cache.dir
+C:/Users/Jeppe/vsprojects/film_rec_front/android/app/.cxx/Debug/3k3e696m/x86/CMakeFiles/rebuild_cache.dir

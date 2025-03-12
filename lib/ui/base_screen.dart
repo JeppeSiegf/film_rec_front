@@ -10,11 +10,15 @@ import 'package:flutter/material.dart';
 
 class FilmRecommenderScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
+  final VoidCallback toggleLocale;
   final ThemeMode currentTheme;
+  final Locale currentLocale;
 
   const FilmRecommenderScreen({
     required this.toggleTheme,
+    required this.toggleLocale,
     required this.currentTheme,
+    required this.currentLocale,
     super.key,
   });
 
@@ -32,9 +36,20 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
         title: const Text('Film Recommender'),
         actions: [
           IconButton(
+  icon: Icon(
+    widget.currentLocale.languageCode == 'local'
+        ? Icons.language_sharp
+        : Icons.home_rounded,
+  ),
+  onPressed: widget.toggleLocale,
+  tooltip: widget.currentLocale.languageCode == 'local'
+      ? 'Globalize'
+      : 'Localize',
+),
+          IconButton(
             icon: Icon(widget.currentTheme == ThemeMode.dark
                 ? Icons.wb_sunny
-                : Icons.nights_stay),
+                : Icons.nightlight),
             onPressed: widget.toggleTheme,
             tooltip: widget.currentTheme == ThemeMode.dark
                 ? 'Switch to Light Mode'
@@ -83,29 +98,51 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
   }
 
 
-  void _handleFilmSelected(Film film) {
-    setState(() {
-      _appState.selectedFilm = film;
-      _appState.showGrid = false;
-      _appState.isImageMoved = false;
-      _appState.isButtonDisabled = false;
-      _appState.recommendations = [];
-    });
-  }
+  Future<void> _fetchRecommendations() async {
+  final selectedFilm = _appState.selectedFilm;  // Store in a local variable
 
-  void _fetchRecommendations() {
-    // Use placeholder data
-    setState(() {
-      _appState.recommendations = _appState.searchResults;
-      _appState.showGrid = true;
-      _appState.isButtonDisabled = true;
-      _appState.isImageMoved = true;
-    });
+  if (selectedFilm != null) {  // Ensure it's not null
+    try {
+      setState(() {
+        _appState.isButtonDisabled = true;  // Disable the button
+        _appState.showGrid = true;  // Show the recommendations grid
+        _appState.isImageMoved = true;  // Update other UI states
+      });
+
+      // ✅ Use the local variable to avoid null safety issues
+      List<Film> recommendations = await ApiService().reccomendFilms(selectedFilm.pageRef);
+      print(recommendations);
+
+      setState(() {
+        _appState.recommendations = recommendations;  // Correctly update recommendations
+      });
+    } catch (error) {
+      // Handle any errors that may occur
+      setState(() {
+        _appState.recommendations = [];  // Reset to empty on error
+      });
+    }
   }
+}
+
+
+void _handleFilmSelected(Film film) {
+  setState(() {
+    _appState.selectedFilm = film;
+    _appState.showGrid = false;
+    _appState.isImageMoved = false;
+    _appState.isButtonDisabled = false;
+    _appState.recommendations = [];
+  });
+
+    // Call this to fetch recommendations after film selection
+}
 
   Widget _buildRecommendationButton() {
     return ElevatedButton(
-      onPressed: _appState.isButtonDisabled ? null : _fetchRecommendations,
+      onPressed: _appState.isButtonDisabled 
+        ? null 
+        : () => _fetchRecommendations(),
       child: const Icon(Icons.movie_filter),
     );
   }

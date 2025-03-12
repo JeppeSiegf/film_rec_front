@@ -30,14 +30,17 @@ void showFilmPopup(BuildContext context, Film film, void Function(Film) onFilmSe
                         ),
                       ),
                       const SizedBox(height: 10),
+                      
                       Text(
+                        
                         film.title,
                         style: Theme.of(context).textTheme.headlineSmall,
                         textAlign: TextAlign.center,
+                        
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s...",
+                        film.description,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
@@ -61,6 +64,7 @@ void showFilmPopup(BuildContext context, Film film, void Function(Film) onFilmSe
                     child: ElevatedButton(
                       onPressed: () {
                         onFilmSelected(film);
+                        
                         Navigator.of(context).popUntil((route) => route.isFirst); 
                       },
                       child: const Icon(Icons.movie_filter),

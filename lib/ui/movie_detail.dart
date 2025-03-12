@@ -1,7 +1,9 @@
 import 'package:film_rec_front/data/models.dart';
 import 'package:film_rec_front/state/app_state.dart';
+import 'package:film_rec_front/theme/theme_manager.dart';
 import 'package:film_rec_front/ui/dir_film_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 class MovieDetailsWidget extends StatelessWidget {
   final Film film;
   final bool isImageMoved;
@@ -19,7 +21,7 @@ class MovieDetailsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedCrossFade(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 350),
       crossFadeState: isImageMoved 
           ? CrossFadeState.showSecond 
           : CrossFadeState.showFirst,
@@ -51,6 +53,7 @@ class MovieDetailsWidget extends StatelessWidget {
           children: [
             _buildTitle(context),
             _buildDirectors(context),
+            const SizedBox(height: 4),
             _buildGenreTags(context)
           ],
         ),
@@ -98,32 +101,56 @@ class MovieDetailsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(BuildContext context) => Column(
+  Widget _buildTitle(BuildContext context) {
+  return Column(
     children: [
       Row(
-        mainAxisAlignment: MainAxisAlignment.center, 
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            film.title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: Row(
+              key: ValueKey<String>(LocalizationManager.locale.languageCode), // Unique key for animation
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  LocalizationManager.locale.languageCode == 'local'
+                      ? film.title
+                      : film.originalTitle,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (isImageMoved) // Conditionally include release year
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      film.releaseYear.toString(),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.normal,
+                      
+                      ),
+                      
+                    ),
+                  ),
+              ],
             ),
           ),
-          if (isImageMoved) 
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0), 
-              child: Text(
-                '${film.releaseYear}',  
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ),
         ],
       ),
     ],
   );
+}
 
   Widget _buildDirectors(BuildContext context) {
   return Padding(
@@ -131,7 +158,7 @@ class MovieDetailsWidget extends StatelessWidget {
     child: Row(
       children: [
         Text(
-          'dir. ',  // Only display "dir." once before the list of directors
+          'dir. ', // Only display "dir." once before the list of directors
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontSize: 12.0,
           ),
@@ -142,7 +169,7 @@ class MovieDetailsWidget extends StatelessWidget {
           return Row(
             children: [
               GestureDetector(
-                onTap: () => showDirectorPopup(context, director, onFilmSelected),
+                onTap: () => showDirectorPopup(context, director, onFilmSelected), // Call to popup function
                 child: Text(
                   director.name,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -160,6 +187,7 @@ class MovieDetailsWidget extends StatelessWidget {
     ),
   );
 }
+
 
   Widget _buildGenreTags(BuildContext context) {
     return Padding(

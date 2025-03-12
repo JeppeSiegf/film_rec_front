@@ -17,3 +17,18 @@ class ThemeManager {
     _themeMode = mode;
   }
 }
+class LocalizationManager {
+  static Locale _locale = const Locale('local');
+  
+  static Locale get locale => _locale;
+  
+  static void toggleLocale() {
+    _locale = _locale.languageCode == 'local'
+        ? const Locale('global')
+        : const Locale('local');
+  }
+  
+  static void setLocale(Locale locale) {
+    _locale = locale;
+  }
+}
