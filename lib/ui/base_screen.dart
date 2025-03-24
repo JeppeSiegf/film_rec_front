@@ -38,8 +38,8 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
           IconButton(
   icon: Icon(
     widget.currentLocale.languageCode == 'local'
-        ? Icons.language_sharp
-        : Icons.home_rounded,
+        ? Icons.translate_rounded
+        : Icons.translate,
   ),
   onPressed: widget.toggleLocale,
   tooltip: widget.currentLocale.languageCode == 'local'
@@ -60,13 +60,23 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
     );
   }
 
-  Widget _buildBody() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(15.0),
-      child: Center(
+Widget _buildBody() {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      // Calculate available height in the viewport.
+      final totalHeight = constraints.maxHeight;
+      // Assume that other UI elements (above the spinner area) take ~250 px.
+      const otherUIHeight = 250.0;
+      // Compute available space for the spinner.
+      final availableForSpinner = totalHeight - otherUIHeight;
+      // Only show spinner if there’s enough space (say, at least 100 px)
+      final showSpinner = availableForSpinner >= 100;
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(15.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            
             SearchBarWidget(
               repository: _movieRepository,
               appState: _appState,
@@ -74,7 +84,6 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
             ),
             const SizedBox(height: 20),
             if (_appState.selectedFilm != null) ...[
-              
               MovieDetailsWidget(
                 film: _appState.selectedFilm!,
                 isImageMoved: _appState.isImageMoved,
@@ -83,19 +92,27 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
               ),
               const SizedBox(height: 20),
               _buildRecommendationButton(),
-              const SizedBox(height: 30),
-             if (_appState.showGrid)
+              const SizedBox(height: 20),
+              // Spinner container that occupies available space if enough room exists.
+              if (_appState.isLoading && showSpinner)
+                Container(
+                  height: availableForSpinner,
+                  alignment: Alignment.center,
+                  child: const CircularProgressIndicator(),
+                )
+              else if (_appState.showGrid && !_appState.isLoading)
                 RecommendationsGrid(
                   key: ValueKey(Theme.of(context).brightness),
                   films: _appState.recommendations,
-                  onFilmSelected: _handleFilmSelected),
-                
+                  onFilmSelected: _handleFilmSelected,
+                ),
             ],
           ],
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
 
 
   Future<void> _fetchRecommendations() async {
@@ -105,8 +122,9 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
     try {
       setState(() {
         _appState.isButtonDisabled = true;  // Disable the button
-        _appState.showGrid = true;  // Show the recommendations grid
+        _appState.showGrid = false;  // Show the recommendations grid
         _appState.isImageMoved = true;  // Update other UI states
+        _appState.isLoading = true;
       });
 
       // ✅ Use the local variable to avoid null safety issues
@@ -114,12 +132,15 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
       print(recommendations);
 
       setState(() {
-        _appState.recommendations = recommendations;  // Correctly update recommendations
+        _appState.recommendations = recommendations;
+        _appState.showGrid = true;
+        _appState.isLoading = false; // Stop spinner
       });
     } catch (error) {
-      // Handle any errors that may occur
       setState(() {
-        _appState.recommendations = [];  // Reset to empty on error
+        _appState.recommendations = [];
+        _appState.isLoading = false; // Stop spinner
+        _appState.showGrid = false;
       });
     }
   }

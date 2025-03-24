@@ -23,7 +23,9 @@ void showDirectorPopup(BuildContext context, Director director, void Function(Fi
                 padding: const EdgeInsets.all(8.0), // Padding around the text
                 child: Text(
                   director.name, // Display the director's name
-                  style: Theme.of(context).textTheme.bodyLarge,
+                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
                   textAlign: TextAlign.center,
                 ),
               ),

@@ -10,4 +10,5 @@ class AppState {
   bool isImageMoved = false;
   bool isImageShrunk = false;
   bool isButtonDisabled = false;
+  bool isLoading = false;
 }

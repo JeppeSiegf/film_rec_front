@@ -39,48 +39,55 @@ class MovieDetailsWidget extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildHorizontalLayout(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(right: 10.0),
-          child: _buildFixedSizeImage(context), // Fixed size image for horizontal layout
-        ),
-        Column(
+Widget _buildHorizontalLayout(BuildContext context) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(right: 10.0),
+        child: _buildFixedSizeImage(context),
+      ),
+      // Ensure the text starts top-left and doesn't get centered
+      Expanded(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitle(context),
             _buildDirectors(context),
             const SizedBox(height: 4),
-            _buildGenreTags(context)
+            _buildGenreTags(context),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildResizableImage(BuildContext context) {
-    // Use MediaQuery to adjust the size based on the screen width in the vertical layout
-    double screenWidth = MediaQuery.of(context).size.width;
-    double imageWidth = isImageMoved ? 66.75 : screenWidth * 0.8; // Dynamic width
-    double imageHeight = imageWidth * (3 / 2); // Maintain the 2:3 aspect ratio
-    
-    // Set the max width to 300px and max height to 200px
-    imageWidth = imageWidth > 400 ? 400 : imageWidth;
-    imageHeight = imageHeight > 600 ? 600 : imageHeight;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.network(
-        film.largeImageRef,
-        width: imageWidth,
-        height: imageHeight,
-        fit: BoxFit.cover,
       ),
-    );
-  }
+    ],
+  );
+}
+
+
+
+Widget _buildResizableImage(BuildContext context) {
+  double screenWidth = MediaQuery.of(context).size.width;
+  double imageWidth = isImageMoved ? 66.75 : screenWidth * 0.8;
+  double imageHeight = imageWidth * (3 / 2);
+
+  // Cap sizes
+  imageWidth = imageWidth > 400 ? 400 : imageWidth;
+  imageHeight = imageHeight > 600 ? 600 : imageHeight;
+
+  final imageWidget = ClipRRect(
+    borderRadius: BorderRadius.circular(8),
+    child: Image.network(
+      film.largeImageRef,
+      width: imageWidth,
+      height: imageHeight,
+      fit: BoxFit.cover,
+    ),
+  );
+
+  // If the image is large, center it; otherwise, keep it left-aligned
+  return isImageMoved ? imageWidget : Center(child: imageWidget);
+}
+
 
   Widget _buildFixedSizeImage(BuildContext context) {
     // In horizontal layout, image stays at a fixed size
@@ -101,88 +108,69 @@ class MovieDetailsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(BuildContext context) {
-  return Column(
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+Widget _buildTitle(BuildContext context) {
+  final locale = LocalizationManager.locale.languageCode;
+  final title = locale == 'local' ? film.title : film.originalTitle;
+
+  return Padding(
+    padding: const EdgeInsets.only(top: 0),
+    child: Text.rich(
+      TextSpan(
         children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            child: Row(
-              key: ValueKey<String>(LocalizationManager.locale.languageCode), // Unique key for animation
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  LocalizationManager.locale.languageCode == 'local'
-                      ? film.title
-                      : film.originalTitle,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+          TextSpan(
+            text: title,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
-                if (isImageMoved) // Conditionally include release year
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      film.releaseYear.toString(),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.normal,
-                      
-                      ),
-                      
-                    ),
-                  ),
-              ],
-            ),
+          ),
+          TextSpan(
+            text: ' (${film.releaseYear})',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontSize: 12.0,
+                ),
           ),
         ],
       ),
-    ],
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      softWrap: true,
+    ),
   );
 }
 
+
+
+
+
+
   Widget _buildDirectors(BuildContext context) {
   return Padding(
-    padding: const EdgeInsets.only(top: 8.0),
-    child: Row(
+    padding: const EdgeInsets.only(top: 0.0),
+    child: Wrap(
+      spacing: 4.0,
+      runSpacing: 2.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          'dir. ', // Only display "dir." once before the list of directors
+          'dir.',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontSize: 12.0,
-          ),
+                fontSize: 12.0,
+              ),
         ),
-        // Create a list of directors with commas between them
         ...List.generate(film.directors.length, (index) {
           final director = film.directors[index];
-          return Row(
-            children: [
-              GestureDetector(
-                onTap: () => showDirectorPopup(context, director, onFilmSelected), // Call to popup function
-                child: Text(
-                  director.name,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          final isLast = index == film.directors.length - 1;
+          return GestureDetector(
+            onTap: () => showDirectorPopup(context, director, onFilmSelected),
+            child: Text(
+              '${director.name}${isLast ? '' : ','}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 12.0,
                     decoration: TextDecoration.underline,
                   ),
-                ),
-              ),
-              if (index < film.directors.length - 1)
-                const Text(', '),  // Add a comma separator, but not after the last director
-            ],
+            ),
           );
-        })
+        }),
       ],
     ),
   );
@@ -193,28 +181,29 @@ class MovieDetailsWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Wrap(
-        spacing: 6.0, 
-        runSpacing: 4.0, 
-        alignment: WrapAlignment.center,
-        children: film.genres.map((genre) {
-          return Container(
-            height: 22, 
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1), 
-              borderRadius: BorderRadius.circular(8.0), 
-            ),
-            alignment: Alignment.center, 
-            child: Text(
-              genre,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 10.0, 
-                color: Theme.of(context).textTheme.bodySmall?.color, 
+  spacing: 6.0,
+  runSpacing: 4.0,
+  alignment: WrapAlignment.start,
+  children: film.genres.map((genre) {
+    return IntrinsicWidth( // This forces width to match content
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondary.withAlpha(25),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Text(
+          genre,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontSize: 10.0,
               ),
-            ),
-          );
-        }).toList(),
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
+    );
+  }).toList(),
+)
+,
     );
   }
 }
