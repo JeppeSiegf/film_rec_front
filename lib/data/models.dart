@@ -50,7 +50,7 @@ class Film {
       runTime: json['runtime'] as int,
       popularity:json['total_watches'] as int,
       genres: (json['genres'] as List?)?.map((genre) => genre.toString().replaceAll(RegExp(r'[<>]'), '')).toList() ?? [],
-      languages: (json['languages'] as List?)?.map((lang) => lang.toString().replaceAll(RegExp(r'[<>]'), '')).toList() ?? [],
+      languages: (json['languages'] as List?)?.map((lang) => lang.toString().replaceAll(RegExp(r'[<>]'), '').split(RegExp(r'[ \(|,]'))[0]).toList() ?? [],
       crewMembers: (json['crew_members'] as List?)
           ?.map((cm) => CrewMember.fromJson(cm as Map<String, dynamic>))
           .where((member) => member.rank != null)
