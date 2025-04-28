@@ -79,11 +79,12 @@ Widget _buildBody() {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SearchBarWidget(
-              repository: _movieRepository,
-              appState: _appState,
-              onFilmSelected: _handleFilmSelected,
-            ),
+             Center(
+      child: SearchBarWidget(
+        repository: _movieRepository,
+        onFilmSelected: _handleFilmSelected,
+            
+            ),),
             const SizedBox(height: 20),
             if (_appState.selectedFilm != null) ...[
               MovieDetailsWidget(

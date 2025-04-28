@@ -1,0 +1,10 @@
+^C:\USERS\JEPPE\VSPROJECTS\FILM_REC_FRONT\BUILD\WINDOWS\X64\CMAKEFILES\3F3EAF82C65D9B7FFAB9EF7D3493E029\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/Jeppe/vsprojects/film_rec_front/windows -BC:/Users/Jeppe/vsprojects/film_rec_front/build/windows/x64 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/Jeppe/vsprojects/film_rec_front/build/windows/x64/film_rec_front.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

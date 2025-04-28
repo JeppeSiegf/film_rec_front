@@ -1,0 +1,28 @@
+^C:\USERS\JEPPE\VSPROJECTS\FILM_REC_FRONT\BUILD\WINDOWS\X64\CMAKEFILES\A34A7E75D47AA9ED762CB76EFCAD9E64\FLUTTER_WINDOWS.DLL.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E env FLUTTER_ROOT=C:\Users\Jeppe\OneDrive\Dokumenter\flutter PROJECT_DIR=C:\Users\Jeppe\vsprojects\film_rec_front FLUTTER_ROOT=C:\Users\Jeppe\OneDrive\Dokumenter\flutter FLUTTER_EPHEMERAL_DIR=C:\Users\Jeppe\vsprojects\film_rec_front\windows\flutter\ephemeral PROJECT_DIR=C:\Users\Jeppe\vsprojects\film_rec_front FLUTTER_TARGET=C:\Users\Jeppe\vsprojects\film_rec_front\lib\main.dart DART_OBFUSCATION=false TRACK_WIDGET_CREATION=true TREE_SHAKE_ICONS=false PACKAGE_CONFIG=C:\Users\Jeppe\vsprojects\film_rec_front\.dart_tool\package_config.json C:/Users/Jeppe/OneDrive/Dokumenter/flutter/packages/flutter_tools/bin/tool_backend.bat windows-x64 Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JEPPE\VSPROJECTS\FILM_REC_FRONT\BUILD\WINDOWS\X64\CMAKEFILES\F2597F9C202E1E3A58B35F0B40990FA7\FLUTTER_ASSEMBLE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JEPPE\VSPROJECTS\FILM_REC_FRONT\WINDOWS\FLUTTER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/Jeppe/vsprojects/film_rec_front/windows -BC:/Users/Jeppe/vsprojects/film_rec_front/build/windows/x64 --check-stamp-file C:/Users/Jeppe/vsprojects/film_rec_front/build/windows/x64/flutter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
