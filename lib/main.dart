@@ -1,5 +1,5 @@
 import 'package:film_rec_front/theme/theme_manager.dart';
-import 'package:film_rec_front/ui/base_screen.dart';
+import 'package:film_rec_front/ui/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';

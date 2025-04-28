@@ -1,12 +1,13 @@
-import 'package:film_rec_front/theme/theme_manager.dart';
+import 'package:film_rec_front/data/models.dart';
+import 'package:film_rec_front/ui/film_dialog.dart';
 import 'package:film_rec_front/utils/hover_overlay.dart';
+import 'package:film_rec_front/utils/poster_diplay.dart';
+import 'package:film_rec_front/utils/title_display.dart';
 import 'package:flutter/material.dart';
-import '../../data/models.dart';
-import 'movie_detail_dialog.dart';
 
 class RecommendationsGrid extends StatelessWidget {
   final List<Film> films;
-  final void Function(Film) onFilmSelected;
+  final void Function(String) onFilmSelected;
 
   const RecommendationsGrid({
     Key? key,
@@ -17,14 +18,14 @@ class RecommendationsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      // Get the total available width.
+      
       final gridWidth = constraints.maxWidth;
       int columns = _calculateColumns(gridWidth);
-      // Define ideal fixed sizes.
+    
       const double idealPosterWidth = 150.0;
       const double idealPosterHeight = 225.0;
       const double idealTitleHeight = 60.0;
-      const double idealSpacing = 6.0;
+      const double idealSpacing = 1.0;
       const double crossAxisSpacing = 8.0;
       
       // Calculate cell width from available grid width.
@@ -73,10 +74,9 @@ class RecommendationsGrid extends StatelessWidget {
   }
 }
 
-
 class FilmGridItem extends StatelessWidget {
   final Film film;
-  final void Function(Film) onFilmSelected;
+  final void Function(String) onFilmSelected;
   final double posterWidth;
   final double posterHeight;
   final double titleHeight;
@@ -99,65 +99,43 @@ class FilmGridItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Fixed-size image container.
+          // Use MovieImageUtils for poster image
           SizedBox(
             width: posterWidth,
             height: posterHeight,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: HoverOverlay(
-                icon: Icons.more_horiz,
-                iconSize: 50 * (posterWidth / 150), // Scale icon accordingly
-                child: Container(
-                  color: Colors.black, // Background for letterboxing
-                  child: Image.network(
-                    film.largeImageRef.isNotEmpty
-                        ? film.largeImageRef
-                        : 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjT4UGd119zdsNYIaupM5Qi1-BaHpIVfQcOUsUl3CutWQWFhRK4vafq7wDKsiv_kN1JmPwO60zEDr2CyOe_imY0fGSOAKTyB76VAOulsJEseCYZJvIEVhFSdloM5KWyaQQ1vzRAsOYRryT/s1600-h/technical-difficulties.jpg',
-                    fit: BoxFit.contain,
-                  ),
-                ),
+            child: HoverOverlay(
+              icon: Icons.more_horiz,
+              iconSize: 50 * (posterWidth / 150),
+              child: MovieImageUtils.buildMoviePoster(
+                imageUrl: film.largeImageRef.isNotEmpty
+                    ? film.largeImageRef
+                    : 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjT4UGd119zdsNYIaupM5Qi1-BaHpIVfQcOUsUl3CutWQWFhRK4vafq7wDKsiv_kN1JmPwO60zEDr2CyOe_imY0fGSOAKTyB76VAOulsJEseCYZJvIEVhFSdloM5KWyaQQ1vzRAsOYRryT/s1600-h/technical-difficulties.jpg',
+                isCompact: true,
+                maxWidth: posterWidth,
+                maxHeight: posterHeight,
+                aspectRatio: posterHeight / posterWidth,
+                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
           ),
           SizedBox(height: spacing),
-          // Fixed title container.
+          // Use MovieTextUtils for film title
           SizedBox(
             width: posterWidth,
             height: titleHeight,
-            child: FilmTitle(film: film),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: MovieTextUtils.buildMovieTitle(
+                film: film,
+                context: context,
+                includeYear: false,
+                textAlign: TextAlign.center,
+                animateLocaleChanges: true,
+                maxLines: 2,
+                titleStyle: Theme.of(context).textTheme.bodyLarge)
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-
-class FilmTitle extends StatelessWidget {
-  final Film film;
-
-  const FilmTitle({Key? key, required this.film}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.bodyMedium!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, animation) =>
-            FadeTransition(opacity: animation, child: child),
-        child: Text(
-          LocalizationManager.locale.languageCode == 'local'
-              ? film.title
-              : film.originalTitle,
-          key: ValueKey<String>(LocalizationManager.locale.languageCode),
-          textAlign: TextAlign.center,
-          style: textStyle,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
       ),
     );
   }

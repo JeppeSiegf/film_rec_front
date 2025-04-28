@@ -1,75 +1,112 @@
-
 class Film {
   final String pageRef;
   final String smallImageRef;
   final String largeImageRef;
+  final String? bannerImageRef;
   final String title;
   final String originalTitle;
   final String description;
   final int releaseYear;
   final int runTime;
+  final int popularity;
   final List<String> genres;
   final List<String> languages;
-  final List<Director> directors;
-  
-  
+  final List<CrewMember> crewMembers;
+  final List<String> roles; //Only used when fetched as part of a credit list
 
-  Film({required this.title, 
-        required this.originalTitle,
-        required this.description,
-        required this.releaseYear, 
-        required this.runTime,
-        required this.smallImageRef,
-        required this.largeImageRef,
-        required this.pageRef,
-        required this.genres,
-        required this.languages,
-        required this.directors,});
+  Film({
+    required this.pageRef,
+    required this.smallImageRef,
+    required this.largeImageRef,
+    this.bannerImageRef,
+    required this.title,
+    required this.originalTitle,
+    required this.description,
+    required this.releaseYear,
+    required this.runTime,
+    required this.popularity,
+    required this.genres,
+    required this.languages,
+    required this.crewMembers,
+    required this.roles,
+  });
 
   @override
   String toString() {
     return '$title ($releaseYear)';
   }
 
- 
-
   factory Film.fromJson(Map<String, dynamic> json) {
-  return Film(
-    pageRef: json['page_ref'] as String,
-    smallImageRef: json['image_ref'] as String,
-    largeImageRef: json['image_ref_large']as String,
-    title: json['title'] as String,
-    originalTitle: json['title_original'] as String? ?? json['title'] as String,
-    description: json['description'] as String,
-    releaseYear: json['release_year'] as int,
-    runTime: json['runtime'] as int,
-    genres: (json['genres'] as List?)?.map((genre) => genre.toString().replaceAll(RegExp(r'[<>]'), '')).toList() ?? [],
-    languages: (json['languages'] as List?)?.map((languages) => languages.toString()).toList() ?? [],
-    directors: (json['directors'] as List?)?.map((director) => 
-      Director(
-        pageRef: director['page_ref'] ?? '', 
-        name: director['name'] ?? ''
-      )
-    ).toList() ?? [],
-  );
-}
+    return Film(
+      pageRef: json['page_ref'] as String,
+      smallImageRef: json['image_ref'] as String,
+      largeImageRef: json['image_ref_large'] as String,
+      bannerImageRef: (json['banner_ref'] as String?),
+
+      title: json['title'] as String,
+      originalTitle: (json['title_original'] as String?) ?? json['title'] as String,
+      description: json['description'] as String,
+      releaseYear: json['release_year'] as int,
+      runTime: json['runtime'] as int,
+      popularity:json['total_watches'] as int,
+      genres: (json['genres'] as List?)?.map((genre) => genre.toString().replaceAll(RegExp(r'[<>]'), '')).toList() ?? [],
+      languages: (json['languages'] as List?)?.map((lang) => lang.toString().replaceAll(RegExp(r'[<>]'), '')).toList() ?? [],
+      crewMembers: (json['crew_members'] as List?)
+          ?.map((cm) => CrewMember.fromJson(cm as Map<String, dynamic>))
+          .where((member) => member.rank != null)
+          .toList() 
+          ?? [],
+      roles: (json['roles'] as List?)?.map((role) => role.toString()).toList() ?? [],
+
+    );
+  }
 }
 
-class Director {
+
+ class SearchResult {
   final String pageRef;
-  final String name;
+  final String title;
+  final int releaseYear;
 
-  Director({required this.pageRef, required this.name});
+  SearchResult({required this.title, required this.pageRef, required this.releaseYear});
 
   @override
   String toString() {
-    return '$name';
+    return '$title ($releaseYear)';
   }
 
-  factory Director.fromJson(Map<String, dynamic> json) {
-    return Director(
+  factory SearchResult.fromJson(Map<String, dynamic> json) {
+    return SearchResult(
       pageRef: json['page_ref'] as String,
-      name: json['name'] as String,
+      title: json['title'] as String,
+      releaseYear: json['release_year'] as int,
     );
   }
+}
+
+class CrewMember {
+  final String pageRef;
+  final String name;
+  final String role;
+  final int rank;
+
+  CrewMember({
+    required this.pageRef,
+    required this.name,
+    required this.role,
+    required this.rank,
+  });
+
+  factory CrewMember.fromJson(Map<String, dynamic> json) {
+    return CrewMember(
+      pageRef: json['page_ref'] as String,
+      name: json['name'] as String,
+      role: json['role'] as String,
+      rank: json['rank'] as int
+
+    );
+  }
+
+  @override
+  String toString() => '$name ($role)';
 }

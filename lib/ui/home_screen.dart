@@ -1,9 +1,11 @@
 
+import 'dart:math';
+
 import 'package:film_rec_front/data/api_service.dart';
 import 'package:film_rec_front/data/models.dart';
 import 'package:film_rec_front/state/app_state.dart';
 import 'package:film_rec_front/theme/theme_manager.dart';
-import 'package:film_rec_front/ui/movie_detail.dart';
+import 'package:film_rec_front/ui/film_header.dart';
 import 'package:film_rec_front/ui/rec_grid.dart';
 import 'package:film_rec_front/ui/search_bar.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +35,7 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Film Recommender'),
+        title: const Text('Siegflix'),
         actions: [
           IconButton(
   icon: Icon(
@@ -120,6 +122,7 @@ Widget _buildBody() {
 
   if (selectedFilm != null) {  // Ensure it's not null
     try {
+      
       setState(() {
         _appState.isButtonDisabled = true;  // Disable the button
         _appState.showGrid = false;  // Show the recommendations grid
@@ -127,9 +130,9 @@ Widget _buildBody() {
         _appState.isLoading = true;
       });
 
-      // ✅ Use the local variable to avoid null safety issues
+     
       List<Film> recommendations = await ApiService().reccomendFilms(selectedFilm.pageRef);
-      print(recommendations);
+      
 
       setState(() {
         _appState.recommendations = recommendations;
@@ -147,13 +150,16 @@ Widget _buildBody() {
 }
 
 
-void _handleFilmSelected(Film film) {
+Future<void> _handleFilmSelected(String page_ref) async {
+  Film film = await ApiService().getFilm(page_ref);
+
   setState(() {
     _appState.selectedFilm = film;
     _appState.showGrid = false;
     _appState.isImageMoved = false;
     _appState.isButtonDisabled = false;
     _appState.recommendations = [];
+   
   });
 
     // Call this to fetch recommendations after film selection

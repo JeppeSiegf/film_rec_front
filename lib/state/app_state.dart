@@ -1,9 +1,9 @@
 import '../data/models.dart';
 
 class AppState {
-  List<Film> searchResults = [];
+  List<SearchResult> searchResults = [];
   Film? selectedFilm;
-  Director? selectedDirector;
+  CrewMember? selectedDirector;
   List<Film> filmography = [];
   List<Film> recommendations = [];
   bool showGrid = false;
