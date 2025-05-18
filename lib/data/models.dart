@@ -78,6 +78,7 @@ class Film {
   final String pageRef;
   final String title;
   final int releaseYear;
+  
 
   SearchResult({required this.title, required this.pageRef, required this.releaseYear});
 
