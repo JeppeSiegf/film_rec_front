@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class Film {
   final String pageRef;
   final String smallImageRef;
@@ -37,11 +39,21 @@ class Film {
   }
 
   factory Film.fromJson(Map<String, dynamic> json) {
+
+  
+    print(dotenv.env['PROXY_URL']);
+    String? proxyBase = dotenv.env['PROXY_URL'];  
+
+    String? _proxy(String url) {
+      if (url == null || url.isEmpty) return null;
+      return '$proxyBase?url=${Uri.encodeComponent(url)}';
+    }
+
     return Film(
       pageRef: json['page_ref'] as String,
-      smallImageRef: json['image_ref'] as String,
-      largeImageRef: json['image_ref_large'] as String,
-      bannerImageRef: (json['banner_ref'] as String?),
+      smallImageRef: _proxy(json['image_ref'] as String)!,
+      largeImageRef: _proxy(json['image_ref_large'] as String)!,
+      bannerImageRef: _proxy(json['banner_ref'] as String),
 
       title: json['title'] as String,
       originalTitle: (json['title_original'] as String?) ?? json['title'] as String,

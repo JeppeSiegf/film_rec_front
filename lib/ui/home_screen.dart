@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'package:film_rec_front/data/api_service.dart';
@@ -31,32 +30,38 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
   final AppState _appState = AppState();
   final ApiService _movieRepository = ApiService();
 
+ 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Siegflix'),
+        title: GestureDetector(
+          onTap: _resetState,
+          child: const Text('Siegflix'),
+        ),
         actions: [
           IconButton(
-  icon: Icon(
-    widget.currentLocale.languageCode == 'local'
-        ? Icons.translate_rounded
-        : Icons.translate,
-  ),
-  onPressed: widget.toggleLocale,
-  tooltip: widget.currentLocale.languageCode == 'local'
-      ? 'Globalize'
-      : 'Localize',
-),
+            icon: Icon(
+              widget.currentLocale.languageCode == 'local'
+                  ? Icons.translate_rounded
+                  : Icons.translate,
+            ),
+            onPressed: widget.toggleLocale,
+            tooltip: widget.currentLocale.languageCode == 'local'
+                ? 'Globalize'
+                : 'Localize',
+          ),
           IconButton(
             icon: Icon(widget.currentTheme == ThemeMode.dark
                 ? Icons.wb_sunny
                 : Icons.nightlight),
             onPressed: widget.toggleTheme,
             tooltip: widget.currentTheme == ThemeMode.dark
-                ? 'Switch to Light Mode'
-                : 'Switch to Dark Mode',)
-                        ],
+                ? 'Light Mode'
+                : 'Dark Mode',
+          ),
+        ],
       ),
       body: _buildBody(),
     );
@@ -178,6 +183,17 @@ Future<void> _handleFilmSelected(String page_ref) async {
   void _toggleImageLayout() {
     setState(() {
       _appState.isImageMoved = !_appState.isImageMoved;
+    });
+  }
+  
+  
+  void _resetState() {
+    setState(() {
+      _appState.selectedFilm = null;
+      _appState.recommendations = [];
+      _appState.isImageMoved = false;
+      _appState.isButtonDisabled = false;
+      _appState.showGrid = false;
     });
   }
 }
