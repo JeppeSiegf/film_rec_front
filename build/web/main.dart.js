@@ -39412,7 +39412,8 @@ I(){return"PosterSize."+this.b}}
 A.a5Y.prototype={
 $1(a){var s,r,q,p,o,n,m=t.w,l=A.br(a,null,m).w.a.a
 switch(this.a.a){case 0:s=l*0.6
-if(s>l)s=l
+if(s>400&&400<=l)s=400
+else if(s>l)s=l
 break
 case 1:s=l*0.24
 break

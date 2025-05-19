@@ -27,8 +27,13 @@ class MovieImageUtils {
       switch (size) {
         case PosterSize.large:
           width = screenWidth * 0.6;
-          // Clamp so it never exceeds screen width
-          width = width > screenWidth ? screenWidth : width;
+          // If the calculated width is less than a max (e.g. 400), use the max, but never exceed screen width
+          double maxLarge = 400.0;
+          if (width > maxLarge && maxLarge <= screenWidth) {
+            width = maxLarge;
+          } else if (width > screenWidth) {
+            width = screenWidth;
+          }
           break;
         case PosterSize.medium:
           width = screenWidth * 0.24; // for home grid
