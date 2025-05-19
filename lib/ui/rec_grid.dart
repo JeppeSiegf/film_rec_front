@@ -94,29 +94,37 @@ class FilmGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Only reduce font size for small screens, otherwise use default
+    final screenWidth = MediaQuery.of(context).size.width;
+    TextStyle? titleStyle = Theme.of(context).textTheme.bodyLarge;
+    if (screenWidth < 500) {
+      titleStyle = titleStyle?.copyWith(fontSize: 13);
+    }
+
+    // Prevent posterWidth from exceeding screen width
+    final safePosterWidth = posterWidth > screenWidth ? screenWidth : posterWidth;
+    final safePosterHeight = posterHeight > (screenWidth / (2/3)) ? (screenWidth / (2/3)) : posterHeight;
+
     return GestureDetector(
       onTap: () => showFilmPopup(context, film, onFilmSelected),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-       
           SizedBox(
-            width: posterWidth,
-            height: posterHeight,
+            width: safePosterWidth,
+            height: safePosterHeight,
             child: HoverOverlay(
               icon: Icons.more_horiz,
-              iconSize: 50 * (posterWidth / 150),
+              iconSize: 50 * (safePosterWidth / 150),
               child: MovieImageUtils.buildMoviePoster(
                 imageUrl: film.largeImageRef,
                 size: PosterSize.medium,
               ),
             ),
           ),
-          
           SizedBox(height: spacing),
-          // Use MovieTextUtils for film title
           SizedBox(
-            width: posterWidth,
+            width: safePosterWidth,
             height: titleHeight,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -127,10 +135,12 @@ class FilmGridItem extends StatelessWidget {
                 textAlign: TextAlign.center,
                 animateLocaleChanges: true,
                 maxLines: 2,
-                titleStyle: Theme.of(context).textTheme.bodyLarge)
+                titleStyle: titleStyle,
+              ),
             ),
           ),
         ],
-      ));
+      ),
+    );
   }
 }

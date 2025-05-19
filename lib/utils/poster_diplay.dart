@@ -26,7 +26,9 @@ class MovieImageUtils {
       // Responsive width based on enum and screen size
       switch (size) {
         case PosterSize.large:
-          width = screenWidth * 0.6; // for headers/details
+          width = screenWidth * 0.6;
+          // Clamp so it never exceeds screen width
+          width = width > screenWidth ? screenWidth : width;
           break;
         case PosterSize.medium:
           width = screenWidth * 0.24; // for home grid
@@ -37,7 +39,7 @@ class MovieImageUtils {
           break;
       }
       // Clamp width for reasonable min/max
-      width = width.clamp(100.0, 400.0);
+      width = width.clamp(100.0, screenWidth);
       double height = width / aspectRatio;
 
       // Calculate pixel dimensions for caching to save memory
