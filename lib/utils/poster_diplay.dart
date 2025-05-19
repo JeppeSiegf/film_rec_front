@@ -1,61 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+enum PosterSize { large, medium, small }
 
 /// Utility class for handling movie images and posters
 class MovieImageUtils {
-  /// Builds a movie poster image that can be resized based on layout
+  /// Proxy wrapper for image URLs
+  static String proxyWrap(String url) {
+    final base = dotenv.env['PROXY_URL'] ?? 'https://www.siegf.org/proxy';
+    return '$base?url=${Uri.encodeComponent(url)}';
+  }
+
+  /// Builds a movie poster image with consistent, context-driven sizing
   static Widget buildMoviePoster({
     required String imageUrl,
-    required bool isCompact,
-    double? maxWidth,
-    double? maxHeight,
+    required PosterSize size,
     BorderRadius? borderRadius,
-    double aspectRatio = 3/2,
+    bool useProxy = true,
   }) {
     return Builder(builder: (context) {
       double screenWidth = MediaQuery.of(context).size.width;
-      double imageWidth = isCompact ? 100 : (maxWidth ?? screenWidth * 0.8);
-      double imageHeight = imageWidth * aspectRatio;
-      
-      // Cap sizes
-      imageWidth = maxWidth != null && imageWidth > maxWidth ? maxWidth : imageWidth;
-      imageHeight = maxHeight != null && imageHeight > maxHeight ? maxHeight : imageHeight;
-      
-      final imageWidget = ClipRRect(
+      double width;
+      double aspectRatio = 2 / 3;
+
+      // Responsive width based on enum and screen size
+      switch (size) {
+        case PosterSize.large:
+          width = screenWidth * 0.6; // for headers/details
+          break;
+        case PosterSize.medium:
+          width = screenWidth * 0.24; // for home grid
+          break;
+        case PosterSize.small:
+        default:
+          width = screenWidth * 0.08; // for dialog grid
+          break;
+      }
+      // Clamp width for reasonable min/max
+      width = width.clamp(100.0, 400.0);
+      double height = width / aspectRatio;
+
+      // Calculate pixel dimensions for caching to save memory
+      final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+      final cacheWidth = (width * devicePixelRatio).round();
+      final cacheHeight = (height * devicePixelRatio).round();
+
+      // Apply proxy if requested
+      final finalUrl = useProxy && imageUrl.startsWith('http') ? proxyWrap(imageUrl) : imageUrl;
+
+      return ClipRRect(
         borderRadius: borderRadius ?? BorderRadius.circular(8),
         child: Image.network(
-          imageUrl,
-          width: imageWidth,
-          height: imageHeight,
+          finalUrl,
+          width: width,
+          height: height,
           fit: BoxFit.cover,
+          cacheWidth: cacheWidth,
+          cacheHeight: cacheHeight,
+          gaplessPlayback: true,
         ),
       );
-      
-      // If the image is compact, don't center it
-      return isCompact ? imageWidget : Center(child: imageWidget);
     });
   }
 }
 
 class FilmBannerImage extends StatelessWidget {
   final String imageUrl;
-  
+  final bool useProxy;
+
   const FilmBannerImage({
-    Key? key, 
+    Key? key,
     required this.imageUrl,
+    this.useProxy = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Vælg enten asset eller network baseret på om URL’en starter med "http"
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cacheWidth = (screenWidth * devicePixelRatio).round();
+    final cacheHeight = ((screenWidth / 2) * devicePixelRatio).round();
+
+    final finalUrl = useProxy && imageUrl.startsWith('http')
+        ? MovieImageUtils.proxyWrap(imageUrl)
+        : imageUrl;
+
     final Widget img = imageUrl.startsWith('http')
-      ? Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-        )
-      : Image.asset(
-          imageUrl,
-          fit: BoxFit.cover,
-        );
+        ? Image.network(
+            finalUrl,
+            fit: BoxFit.cover,
+            cacheWidth: cacheWidth,
+            cacheHeight: cacheHeight,
+            gaplessPlayback: true,
+          )
+        : Image.asset(
+            imageUrl,
+            fit: BoxFit.cover,
+            cacheWidth: cacheWidth,
+            cacheHeight: cacheHeight,
+          );
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
@@ -65,7 +108,7 @@ class FilmBannerImage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [Colors.white, Colors.transparent],
-            stops: [0.75, 1.0],
+            stops: [0.6, 1.0],
           ).createShader(bounds);
         },
         blendMode: BlendMode.dstIn,

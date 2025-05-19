@@ -38,20 +38,19 @@ class MovieDetailsWidget extends StatelessWidget {
   Widget _buildVerticalLayout(BuildContext context) {
     return Column(
       children: [
-         MovieTextUtils.buildMovieTitle(
-                film: film,
-                context: context,
-                includeYear: true,
-                textAlign: TextAlign.start,
-                animateLocaleChanges: true,
-                maxLines: 2,
-              ),
+        MovieTextUtils.buildMovieTitle(
+          film: film,
+          context: context,
+          includeYear: true,
+          textAlign: TextAlign.start,
+          animateLocaleChanges: true,
+          maxLines: 2,
+        ),
         const SizedBox(height: 15),
         MovieImageUtils.buildMoviePoster(
-            imageUrl: film.largeImageRef,
-            isCompact: false,
-            maxHeight: 600,
-            maxWidth: 400), // Updated image resizing with max height
+          imageUrl: film.largeImageRef,
+          size: PosterSize.large,
+        ),
       ],
     );
   }
@@ -65,7 +64,7 @@ class MovieDetailsWidget extends StatelessWidget {
           padding: const EdgeInsets.only(right: 10.0),
           child: MovieImageUtils.buildMoviePoster(
             imageUrl: film.largeImageRef,
-            isCompact: true,
+            size: PosterSize.small,
           ),
         ),
         // Ensure the text starts top-left and doesn't get centered

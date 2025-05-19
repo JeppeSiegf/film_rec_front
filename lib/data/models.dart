@@ -40,18 +40,13 @@ class Film {
 
   factory Film.fromJson(Map<String, dynamic> json) {
    
-    String? proxyBase = dotenv.env['PROXY_URL'] ?? 'https://www.siegf.org/proxy';  
-    String? _proxy(String? url) {
-      if (url == null || url.isEmpty) return null; // Allow null values
-      return '$proxyBase?url=${Uri.encodeComponent(url)}';
-    }
-
+    
     return Film(
       pageRef: json['page_ref'] as String,
-      smallImageRef: _proxy(json['image_ref'] as String)!,
-      largeImageRef: _proxy(json['image_ref_large'] as String)!,
+      smallImageRef: (json['image_ref'] as String)!,
+      largeImageRef: (json['image_ref_large'] as String)!,
       bannerImageRef: json['banner_ref'] != null && (json['banner_ref'] as String).isNotEmpty
-          ? _proxy(json['banner_ref'] as String)
+          ? (json['banner_ref'] as String)
           : null, // Handle null or empty banner_ref
 
       title: json['title'] as String,

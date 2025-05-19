@@ -107,17 +107,12 @@ class FilmGridItem extends StatelessWidget {
               icon: Icons.more_horiz,
               iconSize: 50 * (posterWidth / 150),
               child: MovieImageUtils.buildMoviePoster(
-                imageUrl: film.smallImageRef.isNotEmpty
-                    ? film.smallImageRef
-                    : 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhjT4UGd119zdsNYIaupM5Qi1-BaHpIVfQcOUsUl3CutWQWFhRK4vafq7wDKsiv_kN1JmPwO60zEDr2CyOe_imY0fGSOAKTyB76VAOulsJEseCYZJvIEVhFSdloM5KWyaQQ1vzRAsOYRryT/s1600-h/technical-difficulties.jpg',
-                isCompact: true,
-                maxWidth: posterWidth,
-                maxHeight: posterHeight,
-                aspectRatio: posterHeight / posterWidth,
-                borderRadius: BorderRadius.circular(8.0),
+                imageUrl: film.largeImageRef,
+                size: PosterSize.medium,
               ),
             ),
           ),
+          
           SizedBox(height: spacing),
           // Use MovieTextUtils for film title
           SizedBox(
@@ -136,7 +131,6 @@ class FilmGridItem extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
+      ));
   }
 }
