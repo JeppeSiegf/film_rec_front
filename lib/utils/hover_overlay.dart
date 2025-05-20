@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'; // for kIsWeb
 
@@ -57,51 +59,51 @@ class _HoverOverlayState extends State<HoverOverlay>
 
   bool get _isMobile {
     final platform = Theme.of(context).platform;
-    // Consider mobile if Android/iOS or web on a small screen
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+    // On web, just use shortestSide for mobile detection (no window/userAgent)
     return platform == TargetPlatform.android ||
         platform == TargetPlatform.iOS ||
-        (!kIsWeb && MediaQuery.of(context).size.shortestSide < 600) ||
-        (kIsWeb && MediaQuery.of(context).size.shortestSide < 600);
+        shortestSide < 600;
   }
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => !_isMobile ? _setHovered(true) : null,
-      onExit: (_) => !_isMobile ? _setHovered(false) : null,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: _isMobile ? (_) => _touchController.forward() : null,
-        onTapUp: _isMobile ? (_) => _touchController.reverse() : null,
-        onTapCancel: _isMobile ? () => _touchController.reverse() : null,
-        onPanDown: _isMobile ? (_) => _touchController.forward() : null,
-        onPanEnd: _isMobile ? (_) => _touchController.reverse() : null,
-        onPanCancel: _isMobile ? () => _touchController.reverse() : null,
-        onTap: widget.onTap,
-        child: ClipRRect(
-          borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              widget.child,
-              // Hover effect for desktop/web
-              if (!_isMobile)
-                AnimatedOpacity(
-                  opacity: _isHovered ? 1 : 0,
-                  duration: widget.duration,
-                  curve: Curves.easeInOut,
-                  child: _buildOverlay(),
-                ),
-              // Touch effect for mobile
-              if (_isMobile)
-                AnimatedBuilder(
-                  animation: _touchAnimation,
-                  builder: (context, child) => Opacity(
-                    opacity: _touchAnimation.value,
+    // Use GestureDetector for all platforms, and always show overlay on tap down for mobile (including mobile browsers)
+    return Listener(
+      onPointerDown: _isMobile ? (_) => _touchController.forward() : null,
+      onPointerUp: _isMobile ? (_) => _touchController.reverse() : null,
+      onPointerCancel: _isMobile ? (_) => _touchController.reverse() : null,
+      child: MouseRegion(
+        onEnter: (_) => !_isMobile ? _setHovered(true) : null,
+        onExit: (_) => !_isMobile ? _setHovered(false) : null,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onTap,
+          child: ClipRRect(
+            borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                widget.child,
+                // Hover effect for desktop/web
+                if (!_isMobile)
+                  AnimatedOpacity(
+                    opacity: _isHovered ? 1 : 0,
+                    duration: widget.duration,
+                    curve: Curves.easeInOut,
                     child: _buildOverlay(),
                   ),
-                ),
-            ],
+                // Touch effect for mobile (including mobile browsers)
+                if (_isMobile)
+                  AnimatedBuilder(
+                    animation: _touchAnimation,
+                    builder: (context, child) => Opacity(
+                      opacity: _touchAnimation.value,
+                      child: _buildOverlay(),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
