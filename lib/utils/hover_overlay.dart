@@ -9,7 +9,7 @@ class HoverOverlay extends StatefulWidget {
   final double iconSize;
   final Duration duration;
   final BorderRadius? borderRadius;
-  final VoidCallback? onTap;
+  final Function()? onTap;
  
   const HoverOverlay({
     Key? key,
@@ -25,10 +25,13 @@ class HoverOverlay extends StatefulWidget {
   _HoverOverlayState createState() => _HoverOverlayState();
 }
 
-class _HoverOverlayState extends State<HoverOverlay> {
+class _HoverOverlayState extends State<HoverOverlay> with SingleTickerProviderStateMixin {
   bool _isHovered = false;
-  bool _isTouched = false;
   bool _isDesktopOrWeb = false;
+  
+  // For mobile touch feedback
+  late AnimationController _touchController;
+  late Animation<double> _touchAnimation;
 
   @override
   void initState() {
@@ -38,6 +41,32 @@ class _HoverOverlayState extends State<HoverOverlay> {
         Platform.isWindows || 
         Platform.isMacOS || 
         Platform.isLinux;
+    
+    // Initialize animation controller for touch feedback
+    _touchController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    
+    _touchAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _touchController,
+        curve: Curves.easeIn,
+        reverseCurve: Curves.easeOut,
+      ),
+    );
+    
+    _touchController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _touchController.reverse();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _touchController.dispose();
+    super.dispose();
   }
 
   void _setHovered(bool hovered) {
@@ -46,68 +75,66 @@ class _HoverOverlayState extends State<HoverOverlay> {
     }
   }
 
-  void _setTouched(bool touched) {
-    if (_isTouched != touched) {
-      setState(() => _isTouched = touched);
+  void _handleTap() {
+    // Show brief overlay effect on mobile
+    if (!_isDesktopOrWeb) {
+      _touchController.forward();
+    }
+    
+    // Call the original onTap if provided
+    if (widget.onTap != null) {
+      widget.onTap!();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => _isDesktopOrWeb ? _setHovered(true) : null,
-      onExit: (_) => _isDesktopOrWeb ? _setHovered(false) : null,
+      onEnter: (_) => _setHovered(true),
+      onExit: (_) => _setHovered(false),
       child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: widget.onTap,
-        onTapDown: (_) {
-          if (!_isDesktopOrWeb) _setTouched(true);
-        },
-        onTapUp: (_) {
-          // Keep touch state for a moment before hiding overlay
-          if (!_isDesktopOrWeb) {
-            Future.delayed(const Duration(milliseconds: 200), () {
-              if (mounted) _setTouched(false);
-            });
-          }
-        },
-        onTapCancel: () {
-          if (!_isDesktopOrWeb) _setTouched(false);
-        },
-        // Handle long press for mobile devices
-        onLongPress: () {
-          if (!_isDesktopOrWeb) _setTouched(true);
-        },
-        onLongPressEnd: (_) {
-          if (!_isDesktopOrWeb) {
-            Future.delayed(const Duration(milliseconds: 200), () {
-              if (mounted) _setTouched(false);
-            });
-          }
-        },
+        behavior: HitTestBehavior.opaque,
+        onTap: _handleTap,
         child: ClipRRect(
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
           child: Stack(
             fit: StackFit.expand,
             children: [
               widget.child,
-              AnimatedOpacity(
-                opacity: (_isDesktopOrWeb && _isHovered) || (!_isDesktopOrWeb && _isTouched) ? 1.0 : 0.0,
-                duration: widget.duration,
-                curve: Curves.easeInOut,
-                child: Container(
-                  color: const Color.fromARGB(146, 216, 209, 209),
-                  child: Center(
-                    child: Icon(
-                      widget.icon,
-                      size: widget.iconSize,
-                      color: const Color.fromARGB(225, 61, 59, 61),
-                    ),
-                  ),
+              // For desktop hover effect
+              if (_isDesktopOrWeb)
+                AnimatedOpacity(
+                  opacity: _isHovered ? 1.0 : 0.0,
+                  duration: widget.duration,
+                  curve: Curves.easeInOut,
+                  child: _buildOverlay(),
                 ),
-              ),
+              // For mobile touch effect
+              if (!_isDesktopOrWeb)
+                AnimatedBuilder(
+                  animation: _touchAnimation,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _touchAnimation.value,
+                      child: _buildOverlay(),
+                    );
+                  },
+                ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildOverlay() {
+    return Container(
+      color: const Color.fromARGB(146, 216, 209, 209),
+      child: Center(
+        child: Icon(
+          widget.icon,
+          size: widget.iconSize,
+          color: const Color.fromARGB(225, 61, 59, 61),
         ),
       ),
     );
