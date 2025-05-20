@@ -5,7 +5,7 @@ enum PosterSize { large, medium, small }
 
 /// Utility class for handling movie images and posters
 class MovieImageUtils {
-  /// Proxy wrapper for image URLs
+  /// Wraps an image URL with a proxy ti bypass CORS issues
   static String proxyWrap(String url) {
     final base = dotenv.env['PROXY_URL'] ?? 'https://www.siegf.org/proxy';
     return '$base?url=${Uri.encodeComponent(url)}';
@@ -26,7 +26,7 @@ class MovieImageUtils {
       // Responsive width based on enum and screen size
       switch (size) {
         case PosterSize.large:
-          width = screenWidth * 0.6;
+          width = screenWidth * 0.8;
           // If the calculated width is less than a max (e.g. 400), use the max, but never exceed screen width
           double maxLarge = 400.0;
           if (width > maxLarge && maxLarge <= screenWidth) {
@@ -36,12 +36,11 @@ class MovieImageUtils {
           }
           break;
         case PosterSize.medium:
-          width = screenWidth * 0.24; // for home grid
+          width = screenWidth * 0.24; 
           break;
         case PosterSize.small:
         default:
-          width = screenWidth * 0.08; // for dialog grid
-          break;
+          width = screenWidth * 0.08;
       }
       // Clamp width for reasonable min/max
       width = width.clamp(100.0, screenWidth);
