@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'; // for kIsWeb
 
-/// A widget that shows an overlay icon on hover (desktop) or on touch (mobile).
+/// A widget that shows an overlay icon on hover (desktop/web) or on touch (mobile).
 class HoverOverlay extends StatefulWidget {
   final Widget child;
   final IconData icon;
   final double iconSize;
   final Duration duration;
   final BorderRadius? borderRadius;
-  final Function()? onTap;
- 
+  final VoidCallback? onTap;
+
   const HoverOverlay({
     Key? key,
     required this.child,
@@ -25,42 +24,25 @@ class HoverOverlay extends StatefulWidget {
   _HoverOverlayState createState() => _HoverOverlayState();
 }
 
-class _HoverOverlayState extends State<HoverOverlay> with SingleTickerProviderStateMixin {
+class _HoverOverlayState extends State<HoverOverlay>
+    with SingleTickerProviderStateMixin {
   bool _isHovered = false;
-  bool _isDesktopOrWeb = false;
-  
-  // For mobile touch feedback
   late AnimationController _touchController;
   late Animation<double> _touchAnimation;
 
   @override
   void initState() {
     super.initState();
-    // Determine if we're on desktop/web platforms
-    _isDesktopOrWeb = kIsWeb || 
-        Platform.isWindows || 
-        Platform.isMacOS || 
-        Platform.isLinux;
-    
-    // Initialize animation controller for touch feedback
     _touchController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 300),
     );
-    
     _touchAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _touchController,
-        curve: Curves.easeIn,
-        reverseCurve: Curves.easeOut,
+        curve: Curves.easeInOut,
       ),
     );
-    
-    _touchController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _touchController.reverse();
-      }
-    });
   }
 
   @override
@@ -70,55 +52,54 @@ class _HoverOverlayState extends State<HoverOverlay> with SingleTickerProviderSt
   }
 
   void _setHovered(bool hovered) {
-    if (_isHovered != hovered) {
-      setState(() => _isHovered = hovered);
-    }
+    if (_isHovered != hovered) setState(() => _isHovered = hovered);
   }
 
-  void _handleTap() {
-    // Show brief overlay effect on mobile
-    if (!_isDesktopOrWeb) {
-      _touchController.forward();
-    }
-    
-    // Call the original onTap if provided
-    if (widget.onTap != null) {
-      widget.onTap!();
-    }
+  bool get _isMobile {
+    final platform = Theme.of(context).platform;
+    // Consider mobile if Android/iOS or web on a small screen
+    return platform == TargetPlatform.android ||
+        platform == TargetPlatform.iOS ||
+        (!kIsWeb && MediaQuery.of(context).size.shortestSide < 600) ||
+        (kIsWeb && MediaQuery.of(context).size.shortestSide < 600);
   }
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => _setHovered(true),
-      onExit: (_) => _setHovered(false),
+      onEnter: (_) => !_isMobile ? _setHovered(true) : null,
+      onExit: (_) => !_isMobile ? _setHovered(false) : null,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: _handleTap,
+        onTapDown: _isMobile ? (_) => _touchController.forward() : null,
+        onTapUp: _isMobile ? (_) => _touchController.reverse() : null,
+        onTapCancel: _isMobile ? () => _touchController.reverse() : null,
+        onPanDown: _isMobile ? (_) => _touchController.forward() : null,
+        onPanEnd: _isMobile ? (_) => _touchController.reverse() : null,
+        onPanCancel: _isMobile ? () => _touchController.reverse() : null,
+        onTap: widget.onTap,
         child: ClipRRect(
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
           child: Stack(
             fit: StackFit.expand,
             children: [
               widget.child,
-              // For desktop hover effect
-              if (_isDesktopOrWeb)
+              // Hover effect for desktop/web
+              if (!_isMobile)
                 AnimatedOpacity(
-                  opacity: _isHovered ? 1.0 : 0.0,
+                  opacity: _isHovered ? 1 : 0,
                   duration: widget.duration,
                   curve: Curves.easeInOut,
                   child: _buildOverlay(),
                 ),
-              // For mobile touch effect
-              if (!_isDesktopOrWeb)
+              // Touch effect for mobile
+              if (_isMobile)
                 AnimatedBuilder(
                   animation: _touchAnimation,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: _touchAnimation.value,
-                      child: _buildOverlay(),
-                    );
-                  },
+                  builder: (context, child) => Opacity(
+                    opacity: _touchAnimation.value,
+                    child: _buildOverlay(),
+                  ),
                 ),
             ],
           ),
@@ -126,17 +107,15 @@ class _HoverOverlayState extends State<HoverOverlay> with SingleTickerProviderSt
       ),
     );
   }
-  
-  Widget _buildOverlay() {
-    return Container(
-      color: const Color.fromARGB(146, 216, 209, 209),
-      child: Center(
-        child: Icon(
-          widget.icon,
-          size: widget.iconSize,
-          color: const Color.fromARGB(225, 61, 59, 61),
+
+  Widget _buildOverlay() => Container(
+        color: const Color.fromARGB(146, 216, 209, 209),
+        child: Center(
+          child: Icon(
+            widget.icon,
+            size: widget.iconSize,
+            color: const Color.fromARGB(225, 61, 59, 61),
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
