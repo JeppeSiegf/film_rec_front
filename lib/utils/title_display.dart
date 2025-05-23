@@ -21,7 +21,7 @@ class MovieTextUtils {
     int? maxLines,
     TextStyle? titleStyle,
     TextStyle? yearStyle,
-    bool useOppositeLanguage = false, // New parameter
+    bool useOppositeLanguage = false,
   }) {
     final locale = LocalizationManager.locale.languageCode;
     final title = useOppositeLanguage

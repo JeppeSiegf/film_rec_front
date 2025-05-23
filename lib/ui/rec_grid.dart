@@ -1,6 +1,7 @@
 import 'package:film_rec_front/data/models.dart';
 import 'package:film_rec_front/ui/film_dialog.dart';
 import 'package:film_rec_front/utils/hover_overlay.dart';
+import 'package:film_rec_front/utils/lazy_loader.dart';
 import 'package:film_rec_front/utils/poster_diplay.dart';
 import 'package:film_rec_front/utils/title_display.dart';
 import 'package:flutter/material.dart';
@@ -113,12 +114,15 @@ class FilmGridItem extends StatelessWidget {
           SizedBox(
             width: safePosterWidth,
             height: safePosterHeight,
-            child: HoverOverlay(
-              icon: Icons.more_horiz,
-              iconSize: 50 * (safePosterWidth / 150),
-              child: MovieImageUtils.buildMoviePoster(
-                imageUrl: film.largeImageRef,
-                size: PosterSize.medium,
+            child: LazyLoad(
+              visibilityThreshold: 0.2, // load once 20% visible
+              builder: (_) => HoverOverlay(
+                icon: Icons.more_horiz,
+                iconSize: 50 * (safePosterWidth / 150),
+                chid: MovieImageUtils.buildMoviePoster(
+                  imageUrl: film.largeImageRef,
+                  size: PosterSize.medium,
+                ),
               ),
             ),
           ),
