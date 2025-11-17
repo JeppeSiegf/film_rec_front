@@ -61,15 +61,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? 'Light Mode'
                 : 'Dark Mode',
           ),
+          IconButton(onPressed: null, icon: Icon(Icons.info))
         ],
       ),
      body: Center(
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
+      //  const Text("Jeppe Siegfredsen personal website", style: TextStyle(fontSize: 24, fontWeight: FontWeight.normal)),
+      // const SizedBox(height: 60),
       ResponsiveImage(imagePath: 'lib/assets/constanza.gif'),
       const SizedBox(height: 60), 
-      const Text("Udvalgte Projekter"),
+      const Text("Film Anbefalinger", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       const SizedBox(height: 20), 
       ElevatedButton(
         onPressed: () {

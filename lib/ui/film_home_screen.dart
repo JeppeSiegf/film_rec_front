@@ -148,13 +148,14 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
                         films: _appState.recommendations,
                         onFilmSelected: _handleFilmSelected,
                       ),
-                  ] else
-                    const SizedBox(height: 120),
+                  ] else if (_appState.selectedFilm == null) ...[
+                    const SizedBox(height: 100),
                     Center(
                       child: ResponsiveImage(
                         imagePath:  'lib/assets/constanza_film.gif',
                       ),
                     ),
+                ],
                 ]));
       },
     );
