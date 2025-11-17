@@ -1,0 +1,2 @@
+C:/Users/Jeppe/vsprojects/film_rec_front/android/app/.cxx/RelWithDebInfo/5j3y6l6m/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Jeppe/vsprojects/film_rec_front/android/app/.cxx/RelWithDebInfo/5j3y6l6m/armeabi-v7a/CMakeFiles/rebuild_cache.dir

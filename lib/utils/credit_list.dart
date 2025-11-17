@@ -1,5 +1,6 @@
 import 'package:film_rec_front/data/models.dart';
 import 'package:film_rec_front/ui/crew_dialog.dart';
+import 'package:film_rec_front/utils/dropdown_lists.dart';
 import 'package:flutter/material.dart';
 
 /// Utility class for handling crew member lists with text wrapping
@@ -11,6 +12,7 @@ class CrewListUtils {
     int collapsedMaxRows,
     Function(String) onFilmSelected,
     Function(String) toggleExpanded,
+    {bool showAllRoles = false, VoidCallback? toggleShowAllRoles}
   ) {
     // Extract unique roles
     final roles = film.crewMembers
@@ -29,35 +31,99 @@ class CrewListUtils {
     };
 
     // Sort roles by priority then alphabetically
-    final priority = ['actor', 'director', 'writer', 'producer'];
+    final priority = ['director', 'writer', 'producer', 'actor'];
     final sortedRoles = roles.toList()
       ..sort((a, b) {
-        final aIndex = priority.indexOf(a);
-        final bIndex = priority.indexOf(b);
-        final aPriority = aIndex < 0 ? priority.length : aIndex;
-        final bPriority = bIndex < 0 ? priority.length : bIndex;
-        return aPriority != bPriority ? aPriority - bPriority : a.compareTo(b);
+        final aBilling = roleIcons[a]?.billing ?? double.infinity;
+        final bBilling = roleIcons[b]?.billing ?? double.infinity;
+        return aBilling.compareTo(bBilling);
       });
+
+    // Separate priority and non-priority roles
+    final priorityRoles = sortedRoles.where((role) => priority.contains(role)).toList();
+    final nonPriorityRoles = sortedRoles.where((role) => !priority.contains(role)).toList();
+    final hasNonPriorityRoles = nonPriorityRoles.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: sortedRoles.map((role) {
-        final crewList = film.crewMembers
-            .where((m) => m.role.toLowerCase() == role)
-            .toList()
-          ..sort((a, b) => (a.rank ?? 0).compareTo(b.rank ?? 0));
-        final isExpanded = expandedRoles[role] ?? false;
-        return _buildRoleSection(
-          context,
-          role,
-          displayNames[role]!,
-          crewList,
-          isExpanded,
-          collapsedMaxRows,
-          onFilmSelected,
-          () => toggleExpanded(role),
-        );
-      }).toList(),
+      children: [
+        // Always show priority roles
+        ...priorityRoles.map((role) {
+          final crewList = film.crewMembers
+              .where((m) => m.role.toLowerCase() == role)
+              .toList()
+            ..sort((a, b) => (a.rank ?? 0).compareTo(b.rank ?? 0));
+          final isExpanded = expandedRoles[role] ?? false;
+          return _buildRoleSection(
+            context,
+            role,
+            displayNames[role]!,
+            crewList,
+            isExpanded,
+            collapsedMaxRows,
+            onFilmSelected,
+            () => toggleExpanded(role),
+          );
+        }).toList(),
+        
+        // Show non-priority roles with animation
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: showAllRoles
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: nonPriorityRoles.map((role) {
+                    final crewList = film.crewMembers
+                        .where((m) => m.role.toLowerCase() == role)
+                        .toList()
+                      ..sort((a, b) => (a.rank ?? 0).compareTo(b.rank ?? 0));
+                    final isExpanded = expandedRoles[role] ?? false;
+                    return _buildRoleSection(
+                      context,
+                      role,
+                      displayNames[role]!,
+                      crewList,
+                      isExpanded,
+                      collapsedMaxRows,
+                      onFilmSelected,
+                      () => toggleExpanded(role),
+                    );
+                  }).toList(),
+                )
+              : const SizedBox.shrink(),
+        ),
+        
+        // Show expand/collapse button for non-priority roles if they exist - moved to bottom
+        if (hasNonPriorityRoles) ...[
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: toggleShowAllRoles,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  showAllRoles ? 'Show Less' : 'Show Full Credits',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color:  Theme.of(context).colorScheme.onSurfaceVariant,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  showAllRoles ? '▲' : '▼',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color:  Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ],
     );
   }
 
@@ -108,7 +174,7 @@ class CrewListUtils {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    title,
+                    title.contains('Actor') ? 'Cast' : title,
                     style: Theme.of(context)
                         .textTheme
                         .titleSmall

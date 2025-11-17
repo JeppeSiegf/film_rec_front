@@ -8,6 +8,8 @@ import 'package:film_rec_front/utils/base_dialog.dart';
 import 'package:film_rec_front/utils/dropdown_lists.dart';
 import 'package:flutter/material.dart';
 
+import '../data/models.dart';
+
 void showCrewPopup(
     BuildContext context, CrewMember crewMember, String crewRole, void Function(String) onFilmSelected) {
   final apiService = ApiService();
@@ -171,9 +173,13 @@ class _CrewPopupContentState extends State<CrewPopupContent> {
       case "Alphabetical":
         films.sort((a, b) => a.title.compareTo(b.title));
         break;
+      case "Rating":
+        films.sort((a, b) => b.ltbxdRating!.compareTo(a.ltbxdRating!));
+        break;
       case "Release Year":
         films.sort((a, b) => b.releaseYear.compareTo(a.releaseYear));
         break;
+      
       case "Popularity":
       default:
         films.sort((a, b) => b.popularity.compareTo(a.popularity));
@@ -207,7 +213,7 @@ class _CrewPopupContentState extends State<CrewPopupContent> {
                 ),
               const SizedBox(width: 2),
               CustomDropdown<String>(
-                items: const ['Popularity', "Alphabetical", "Release Year"],
+                items: const ['Popularity', "Alphabetical","Rating", "Release Year"],
                 iconMap: sortingIcons,
                 selectedItem: _selectedSortOption,
                 onItemSelected: _sortFilms,

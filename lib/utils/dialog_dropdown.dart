@@ -1,8 +1,9 @@
+import 'package:film_rec_front/utils/dropdown_lists.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropdown<T> extends StatefulWidget {
   final List<T> items;
-  final Map<T, IconData> iconMap;
+  final Map<T, roleInfo> iconMap;
   final T selectedItem;
   final void Function(T) onItemSelected;
 
@@ -47,91 +48,77 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
     });
   }
 
-  OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final Offset offset = renderBox.localToGlobal(Offset.zero);
-    final Size buttonSize = renderBox.size;
-    final theme = Theme.of(context);
-
-    return OverlayEntry(
-      builder: (context) {
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: _removeOverlay,
-          child: Stack(
-            children: [
-              Positioned(
-                left: offset.dx,
-                top: offset.dy + buttonSize.height,
-                child: CompositedTransformFollower(
-                  link: _layerLink,
-                  offset: Offset(0, buttonSize.height),
-                  showWhenUnlinked: false,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: theme.brightness == Brightness.dark
-                            ? Colors.grey[850]
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: IntrinsicWidth(
-                        child: Column(
+OverlayEntry _createOverlayEntry() {
+  RenderBox renderBox = context.findRenderObject() as RenderBox;
+  final offset = renderBox.localToGlobal(Offset.zero);
+  final buttonSize = renderBox.size;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  
+  return OverlayEntry(
+    builder: (context) => GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: _removeOverlay,
+      child: Stack(
+        children: [
+          Positioned(
+           right: MediaQuery.of(context).size.width - (offset.dx + buttonSize.width), // Align right edges
+ 
+            top: offset.dy + buttonSize.height,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black26, blurRadius: 5),
+                  ],
+                ),
+                child: IntrinsicWidth(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: widget.items.map((item) => InkWell(
+                      onTap: () {
+                        widget.onItemSelected(item);
+                        _removeOverlay();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: widget.items.map((T item) {
-                            return InkWell(
-                              borderRadius: BorderRadius.zero,
-                              onTap: () {
-                                widget.onItemSelected(item);
-                                _removeOverlay();
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 8),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      widget.iconMap[item] ?? Icons.more_vert,
-                                      size: 18,
-                                      color: theme.brightness == Brightness.dark
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _capitalize(item.toString()),
-                                      style: TextStyle(
-                                        color: theme.brightness == Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                           
+                            Text(
+                              _capitalize(item.toString()),
+                            
+                              style: TextStyle(
+                                
+                                color: isDark ? Colors.white : Colors.black,
                               ),
-                            );
-                          }).toList(),
+                            ),
+                            const SizedBox(width: 5),
+                             Icon(
+                              widget.iconMap[item]?.icon ?? Icons.more_vert,
+                              size: 18,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                            
+                          ],
                         ),
                       ),
-                    ),
+                    )).toList(),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        );
-      },
-    );
-  }
+        ],
+      ),
+    ),
+  );
+}
 
   String _capitalize(String s) {
     if (s.isEmpty) return s;
@@ -158,7 +145,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
             transitionBuilder: (child, animation) =>
                 FadeTransition(opacity: animation, child: child),
             child: Icon(
-              widget.iconMap[widget.selectedItem] ?? Icons.more_vert,
+              widget.iconMap[widget.selectedItem]?.icon ?? Icons.more_vert,
               // Adding a key to ensure AnimatedSwitcher detects the change
               key: ValueKey<T>(widget.selectedItem),
               size: 24,

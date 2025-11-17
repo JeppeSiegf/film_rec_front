@@ -1,17 +1,18 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:http/http.dart' as http;
 import '/data/models.dart'; 
 
 
 class ApiService {
   
-  final String? apiUrl;
+  final String apiUrl;
 
-  ApiService() : apiUrl = dotenv.env['API_BASE_URL'] ?? 'https://filmrec-production.up.railway.app' ; 
-  
-  
- 
+  ApiService()
+      : apiUrl = const String.fromEnvironment(
+            'API_BASE_URL',
+            defaultValue: 'https://filmrec-production.up.railway.app');
+
   // This method connects to the Flask search endpoint
   Future<List<SearchResult>> searchFilms(String query) async {
    
@@ -54,12 +55,37 @@ class ApiService {
 
 
 
-  Future<List<Film>> getFilmography(String directorRef) async {
-   if (directorRef.isEmpty) {
+  Future<List<Film>> getFilmography(String crewRef) async {
+   if (crewRef.isEmpty) {
     throw Exception("page_ref cannot be empty");
   }
+
+  final url = Uri.parse('$apiUrl/api/films/by?crew_ref=$crewRef');
+
   
-  final url = Uri.parse('$apiUrl/api/films/by?director_ref=$directorRef'); 
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    
+    List data = jsonDecode(response.body);
+    
+    
+    return data.map((filmData) => Film.fromJson(filmData)).toList();
+  } else if (response.statusCode == 404) {
+ 
+    throw Exception('No matching films found');
+  } else {
+   
+    throw Exception('Failed to search films');
+  }
+}
+
+Future<List<Film>> getFilmSeries(int series_id) async {
+   if (series_id.isNaN) {
+    throw Exception("series_id not valied");
+  }
+
+  final url = Uri.parse('$apiUrl/api/films/in?series_id=$series_id');
 
   
   final response = await http.get(url);

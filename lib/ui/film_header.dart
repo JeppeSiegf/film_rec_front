@@ -41,7 +41,7 @@ class MovieDetailsWidget extends StatelessWidget {
         MovieTextUtils.buildMovieTitle(
           film: film,
           context: context,
-          includeYear: true,
+          includeYear: false,
           textAlign: TextAlign.start,
           animateLocaleChanges: true,
           maxLines: 2,

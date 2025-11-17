@@ -1,11 +1,12 @@
 import 'package:film_rec_front/theme/theme_manager.dart';
-import 'package:film_rec_front/ui/home_screen.dart';
+import 'package:film_rec_front/ui/film_home_screen.dart';
+import 'package:film_rec_front/ui/home_sceen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  await dotenv.load(); // Load .env file
+
   runApp(const MyApp());
 }
 
@@ -40,12 +41,32 @@ class _MyAppState extends State<MyApp> {
       darkTheme: ThemeData.dark(),
       themeMode: ThemeManager.themeMode,
       locale: LocalizationManager.locale,
-      home: FilmRecommenderScreen(
-        toggleTheme: _toggleTheme,
-        toggleLocale: _toggleLocale,
-        currentTheme: ThemeManager.themeMode,
-        currentLocale: LocalizationManager.locale,
-      )
+
+      onGenerateRoute: (settings) {
+        // Handle dynamic paths
+        final Uri uri = Uri.parse(settings.name!);
+
+        if (uri.pathSegments.isEmpty) {
+          return MaterialPageRoute(builder: (_) => HomeScreen( toggleTheme: _toggleTheme,
+              toggleLocale: _toggleLocale,
+              currentTheme: ThemeManager.themeMode,
+              currentLocale: LocalizationManager.locale,));
+        }
+
+          if (uri.pathSegments[0] == 'film') {
+          return MaterialPageRoute(builder: (_) => FilmRecommenderScreen(
+              toggleTheme: _toggleTheme,
+              toggleLocale: _toggleLocale,
+              currentTheme: ThemeManager.themeMode,
+              currentLocale: LocalizationManager.locale,
+      ));
+        }
+
+        // Fallback 404 page
+        // return MaterialPageRoute(builder: (_) => NotFoundPage());
+
+      }
+      
     );
   }
 }

@@ -115,11 +115,11 @@ class FilmGridItem extends StatelessWidget {
             width: safePosterWidth,
             height: safePosterHeight,
             child: LazyLoad(
-              visibilityThreshold: 0.2, // load once 20% visible
+              
               builder: (_) => HoverOverlay(
                 icon: Icons.more_horiz,
                 iconSize: 50 * (safePosterWidth / 150),
-                chid: MovieImageUtils.buildMoviePoster(
+                child: MovieImageUtils.buildMoviePoster(
                   imageUrl: film.largeImageRef,
                   size: PosterSize.medium,
                 ),
