@@ -104,6 +104,7 @@ class FilmBannerImage extends StatelessWidget {
         ? Image.network(
             finalUrl,
             fit: BoxFit.cover,
+            alignment: Alignment.center,  
             cacheWidth: cacheWidth,
             cacheHeight: cacheHeight,
             gaplessPlayback: true,
@@ -120,25 +121,29 @@ class FilmBannerImage extends StatelessWidget {
         : Image.asset(
             imageUrl,
             fit: BoxFit.cover,
+            alignment: Alignment.center,            
             cacheWidth: cacheWidth,
             cacheHeight: cacheHeight,
           );
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8.0),
-      child: ShaderMask(
-        shaderCallback: (Rect bounds) {
-          return const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.transparent],
-            stops: [0.55, 0.95],
-          ).createShader(bounds);
-        },
-        blendMode: BlendMode.dstIn,
-        child: img,
+  borderRadius: BorderRadius.circular(8.0),
+  child: AspectRatio(
+    aspectRatio: 2.0,
+    child: ShaderMask(
+      shaderCallback: (Rect bounds) {
+        return const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.white, Colors.transparent],
+          stops: [0.55, 0.95],
+        ).createShader(bounds);
+      },
+      blendMode: BlendMode.dstIn,
+      child: SizedBox.expand(
+        child: img
       ),
-    );
+    )));
   }
 }
 
