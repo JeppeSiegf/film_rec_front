@@ -147,31 +147,37 @@ class ResponsiveImage extends StatelessWidget {
   final String imagePath;
   final double maxWidth;
   final double minWidth; 
-  final double borderRadius;
+  final double maxBorderRadius; 
+  final double minBorderRadius;
 
   const ResponsiveImage({
     super.key,
     required this.imagePath,
     this.maxWidth = 350,
     this.minWidth = 100,
-    this.borderRadius = 80,
+    this.maxBorderRadius = 80,
+    this.minBorderRadius = 40,
   });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-       
+        // Compute width: min(2/3 of parent, maxWidth), but not smaller than minWidth
         final twoThirdsWidth = constraints.maxWidth * 2 / 3;
-        final imageWidth =
-            math.max(math.min(twoThirdsWidth, maxWidth), minWidth);
+        final imageWidth = math.max(math.min(twoThirdsWidth, maxWidth), minWidth);
+
+        // Scale border radius linearly
+        final radius = ((imageWidth - minWidth) / (maxWidth - minWidth)) *
+                (maxBorderRadius - minBorderRadius) +
+            minBorderRadius;
 
         return ClipRRect(
-          borderRadius: BorderRadius.circular(borderRadius),
+          borderRadius: BorderRadius.circular(radius),
           child: Image.asset(
             imagePath,
             width: imageWidth,
-            height: imageWidth,
+            height: imageWidth, // square image
             fit: BoxFit.cover,
           ),
         );
@@ -179,3 +185,4 @@ class ResponsiveImage extends StatelessWidget {
     );
   }
 }
+

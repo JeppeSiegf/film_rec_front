@@ -67,9 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      ResponsiveImage(imagePath: 'lib/assets/constanza_film.gif'),
-
-      const SizedBox(height: 60), // spacing
+      ResponsiveImage(imagePath: 'lib/assets/constanza.gif'),
+      const SizedBox(height: 60), 
+      const Text("Udvalgte Projekter"),
+      const SizedBox(height: 20), 
       ElevatedButton(
         onPressed: () {
           // Navigate to the Film page
@@ -85,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
+        
         child: const Icon(Icons.movie),
       ),
     ],
