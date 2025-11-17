@@ -64,7 +64,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - .env
+   
     - lib/assets/banner_fallback.jpg
     - lib/assets/constanza.gif
     - lib/assets/constanza_film.gif
