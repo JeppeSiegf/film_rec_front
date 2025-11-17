@@ -8,6 +8,7 @@ import 'package:film_rec_front/ui/film_header.dart';
 import 'package:film_rec_front/ui/film_home_screen.dart';
 import 'package:film_rec_front/ui/rec_grid.dart';
 import 'package:film_rec_front/ui/search_bar.dart';
+import 'package:film_rec_front/utils/poster_diplay.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -66,15 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
   child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(80), // round corners
-        child: Image.asset(
-          'lib/assets/constanza.gif',
-          width: 350,
-          height: 350,
-          fit: BoxFit.cover,
-        ),
-      ),
+      ResponsiveImage(imagePath: 'lib/assets/constanza_film.gif'),
+
       const SizedBox(height: 60), // spacing
       ElevatedButton(
         onPressed: () {
@@ -91,16 +85,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        child: const Text('Go to Film Page'),
+        child: const Icon(Icons.movie),
       ),
     ],
   ),
-),
-
-  );
-
-
+    ),
+    ); 
   }
+
+
+
+  
 
   void _resetState() {
       

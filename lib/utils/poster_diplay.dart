@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -137,6 +138,44 @@ class FilmBannerImage extends StatelessWidget {
         blendMode: BlendMode.dstIn,
         child: img,
       ),
+    );
+  }
+}
+
+
+class ResponsiveImage extends StatelessWidget {
+  final String imagePath;
+  final double maxWidth;
+  final double minWidth; 
+  final double borderRadius;
+
+  const ResponsiveImage({
+    super.key,
+    required this.imagePath,
+    this.maxWidth = 350,
+    this.minWidth = 100,
+    this.borderRadius = 80,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+       
+        final twoThirdsWidth = constraints.maxWidth * 2 / 3;
+        final imageWidth =
+            math.max(math.min(twoThirdsWidth, maxWidth), minWidth);
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Image.asset(
+            imagePath,
+            width: imageWidth,
+            height: imageWidth,
+            fit: BoxFit.cover,
+          ),
+        );
+      },
     );
   }
 }

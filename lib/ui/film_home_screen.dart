@@ -7,6 +7,7 @@ import 'package:film_rec_front/theme/theme_manager.dart';
 import 'package:film_rec_front/ui/film_header.dart';
 import 'package:film_rec_front/ui/rec_grid.dart';
 import 'package:film_rec_front/ui/search_bar.dart';
+import 'package:film_rec_front/utils/poster_diplay.dart';
 import 'package:flutter/material.dart';
 
 class FilmRecommenderScreen extends StatefulWidget {
@@ -81,86 +82,80 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
         return SingleChildScrollView(
             padding: const EdgeInsets.all(15.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Center(
-                  child: SearchBarWidget(
-                    repository: _movieRepository,
-                    onFilmSelected: _handleFilmSelected,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (_appState.selectedFilm != null) ...[
-                  MovieDetailsWidget(
-                    film: _appState.selectedFilm!,
-                    isImageMoved: _appState.isImageMoved,
-                    onToggle: _toggleImageLayout,
-                    onFilmSelected: _handleFilmSelected,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildRecommendationButton(),
-                  const SizedBox(height: 20),
-                  // Spinner container that occupies available space if enough room exists.
-                  if (_appState.isLoading && showSpinner)
-                    Container(
-                      height: availableForSpinner,
-                      alignment: Alignment.center,
-                      child: const CircularProgressIndicator(),
-                    )
-                  else if (!_appState.isLoading &&
-                      _appState.selectedFilm != null &&
-                      (_appState.recommendations == null ||
-                          _appState.recommendations.isEmpty) &&
-                      _appState.isButtonDisabled)
-                    Container(
-                      height: availableForSpinner,
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.sentiment_very_dissatisfied_sharp,
-                            size: 128,
-                            color: Theme.of(context).disabledColor,
-                          ),
-                          const SizedBox(height: 18),
-                          Text(
-                            'No recommendations available',
-                            overflow: TextOverflow.clip,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  fontSize: 24,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                          ),
-                        ],
-                      ),
-                    )
-                  else if (_appState.showGrid && !_appState.isLoading)
-                    RecommendationsGrid(
-                      key: ValueKey(Theme.of(context).brightness),
-                      films: _appState.recommendations,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: SearchBarWidget(
+                      repository: _movieRepository,
                       onFilmSelected: _handleFilmSelected,
                     ),
-                ] else
-                  Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(80), // round corners
-                      child: Image.asset(
-                        'lib/assets/constanza_film.gif',
-                        width: 350,
-                        height: 350,
-                        fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 20),
+                  if (_appState.selectedFilm != null) ...[
+                    MovieDetailsWidget(
+                      film: _appState.selectedFilm!,
+                      isImageMoved: _appState.isImageMoved,
+                      onToggle: _toggleImageLayout,
+                      onFilmSelected: _handleFilmSelected,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildRecommendationButton(),
+                    const SizedBox(height: 20),
+                    // Spinner container that occupies available space if enough room exists.
+                    if (_appState.isLoading && showSpinner)
+                      Container(
+                        height: availableForSpinner,
+                        alignment: Alignment.center,
+                        child: const CircularProgressIndicator(),
+                      )
+                    else if (!_appState.isLoading &&
+                        _appState.selectedFilm != null &&
+                        (_appState.recommendations == null ||
+                            _appState.recommendations.isEmpty) &&
+                        _appState.isButtonDisabled)
+                      Container(
+                        height: availableForSpinner,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.sentiment_very_dissatisfied_sharp,
+                              size: 128,
+                              color: Theme.of(context).disabledColor,
+                            ),
+                            const SizedBox(height: 18),
+                            Text(
+                              'No recommendations available',
+                              overflow: TextOverflow.clip,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontSize: 24,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else if (_appState.showGrid && !_appState.isLoading)
+                      RecommendationsGrid(
+                        key: ValueKey(Theme.of(context).brightness),
+                        films: _appState.recommendations,
+                        onFilmSelected: _handleFilmSelected,
+                      ),
+                  ] else
+                    const SizedBox(height: 120),
+                    Center(
+                      child: ResponsiveImage(
+                        imagePath:  'lib/assets/constanza_film.gif',
                       ),
                     ),
-                  )
-              ],
-            ));
+                ]));
       },
     );
   }
