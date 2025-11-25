@@ -337,7 +337,7 @@ class _FilmPopupContentState extends State<FilmPopupContent>
           context,
           onPressed: () {
             widget.onFilmSelected(film.pageRef);
-            Navigator.of(context).popUntil((r) => r.isFirst);
+            Navigator.of(context).pop();
           },
           icon: Icons.movie_filter,
         ),
