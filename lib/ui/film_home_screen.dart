@@ -9,6 +9,7 @@ import 'package:film_rec_front/ui/rec_grid.dart';
 import 'package:film_rec_front/ui/search_bar.dart';
 import 'package:film_rec_front/utils/poster_diplay.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class FilmRecommenderScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -37,7 +38,7 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
-          onTap: _resetState,
+          onTap: () => context.go('/'),
           child: const Text('siegfredsen.org'),
         ),
         actions: [
@@ -70,11 +71,8 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
   Widget _buildBody() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calculate available height in the viewport.
         final totalHeight = constraints.maxHeight;
-        // Assume that other UI elements (above the spinner area) take ~250 px.
         const otherUIHeight = 250.0;
-        // Compute available space for the spinner.
         final availableForSpinner = totalHeight - otherUIHeight;
         // Only show spinner if there’s enough space (say, at least 100 px)
         final showSpinner = availableForSpinner >= 100;

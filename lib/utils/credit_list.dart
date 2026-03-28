@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 /// Utility class for handling crew member lists with text wrapping
 class CrewListUtils {
   static Widget buildCreditLists(
-    BuildContext context,
-    Film film,
-    Map<String, bool> expandedRoles,
-    int collapsedMaxRows,
-    Function(String) onFilmSelected,
-    Function(String) toggleExpanded,
-    {bool showAllRoles = false, VoidCallback? toggleShowAllRoles}
-  ) {
+      BuildContext context,
+      Film film,
+      Map<String, bool> expandedRoles,
+      int collapsedMaxRows,
+      Function(String) onFilmSelected,
+      Function(String) toggleExpanded,
+      {bool showAllRoles = false,
+      VoidCallback? toggleShowAllRoles}) {
     // Extract unique roles
     final roles = film.crewMembers
         .where((m) => m.role.isNotEmpty)
@@ -26,7 +26,8 @@ class CrewListUtils {
         role: role
             .replaceAll('-', ' ')
             .split(' ')
-            .map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : '')
+            .map((w) =>
+                w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : '')
             .join(' ')
     };
 
@@ -40,8 +41,10 @@ class CrewListUtils {
       });
 
     // Separate priority and non-priority roles
-    final priorityRoles = sortedRoles.where((role) => priority.contains(role)).toList();
-    final nonPriorityRoles = sortedRoles.where((role) => !priority.contains(role)).toList();
+    final priorityRoles =
+        sortedRoles.where((role) => priority.contains(role)).toList();
+    final nonPriorityRoles =
+        sortedRoles.where((role) => !priority.contains(role)).toList();
     final hasNonPriorityRoles = nonPriorityRoles.isNotEmpty;
 
     return Column(
@@ -65,7 +68,7 @@ class CrewListUtils {
             () => toggleExpanded(role),
           );
         }).toList(),
-        
+
         // Show non-priority roles with animation
         AnimatedSize(
           duration: const Duration(milliseconds: 300),
@@ -93,7 +96,7 @@ class CrewListUtils {
                 )
               : const SizedBox.shrink(),
         ),
-        
+
         // Show expand/collapse button for non-priority roles if they exist - moved to bottom
         if (hasNonPriorityRoles) ...[
           const SizedBox(height: 8),
@@ -105,17 +108,18 @@ class CrewListUtils {
                 Text(
                   showAllRoles ? 'Show Less' : 'Show Full Credits',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color:  Theme.of(context).colorScheme.onSurfaceVariant,
-                    decoration: TextDecoration.underline,
-                    decorationColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        decoration: TextDecoration.underline,
+                        decorationColor:
+                            Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   showAllRoles ? '▲' : '▼',
                   style: TextStyle(
                     fontSize: 12,
-                    color:  Theme.of(context).colorScheme.onSurfaceVariant,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -144,16 +148,18 @@ class CrewListUtils {
       child: LayoutBuilder(
         builder: (ctx, constraints) {
           // Prepare text style and fixed widths
-          final textStyle = Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(fontSize: 12);
+          final textStyle =
+              Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12);
           final startText = '';
           final endText = '...';
           final startW = (startText.isNotEmpty)
-              ? _calculateTextWidth(TextSpan(text: startText, style: textStyle), context) + 4
+              ? _calculateTextWidth(
+                      TextSpan(text: startText, style: textStyle), context) +
+                  4
               : 0.0;
-          final endW = _calculateTextWidth(TextSpan(text: endText, style: textStyle), context) + 4;
+          final endW = _calculateTextWidth(
+                  TextSpan(text: endText, style: textStyle), context) +
+              4;
 
           // Calculate how many fit
           final visibleCount = _calculateVisibleCrewCount(
@@ -203,8 +209,8 @@ class CrewListUtils {
                   context: context,
                   maxWidth: constraints.maxWidth,
                   maxRows: maxRows,
-                  onCrewTapped: (member, role) => showCrewPopup(
-                      context, member, role, onFilmSelected),
+                  onCrewTapped: (member, role) =>
+                      showCrewPopup(context, member, role, onFilmSelected),
                   endText: endText,
                   onMoreTapped: toggleExpanded,
                   textStyle: textStyle,
@@ -234,7 +240,8 @@ class CrewListUtils {
     for (int i = 0; i < crew.length; i++) {
       final isLast = i == crew.length - 1;
       final txt = isLast ? crew[i].name : '${crew[i].name},';
-      final w = _calculateTextWidth(TextSpan(text: txt, style: style), context) + 4;
+      final w =
+          _calculateTextWidth(TextSpan(text: txt, style: style), context) + 4;
 
       if (rowW + w > maxWidth) {
         rows++;
@@ -254,7 +261,7 @@ class CrewListUtils {
     return count;
   }
 
-  // Kept buildCrewList method signature identical for compatibility
+  // Crew list for film header and subcomponent for credit lists 
   static Widget buildCrewList({
     required List<CrewMember> crewMembers,
     required String role,
@@ -281,9 +288,13 @@ class CrewListUtils {
       width: maxWidth,
       child: LayoutBuilder(builder: (context, constraints) {
         final startW = (startText?.isNotEmpty ?? false)
-            ? _calculateTextWidth(TextSpan(text: startText, style: effectiveStyle), context) + 4
+            ? _calculateTextWidth(
+                    TextSpan(text: startText, style: effectiveStyle), context) +
+                4
             : 0.0;
-        final endW = _calculateTextWidth(TextSpan(text: endText, style: effectiveStyle), context) + 4;
+        final endW = _calculateTextWidth(
+                TextSpan(text: endText, style: effectiveStyle), context) +
+            4;
 
         final visibleCrew = _calculateVisibleCrew(
           crew,
@@ -306,8 +317,8 @@ class CrewListUtils {
 
         for (int i = 0; i < visibleCrew.length; i++) {
           final member = visibleCrew[i];
-          final isLastVisible = i == visibleCrew.length - 1 &&
-              visibleCrew.length == crew.length;
+          final isLastVisible =
+              i == visibleCrew.length - 1 && visibleCrew.length == crew.length;
           final txt = isLastVisible ? member.name : '${member.name},';
 
           widgets.add(
@@ -315,8 +326,8 @@ class CrewListUtils {
               onTap: () => onCrewTapped(member, role),
               child: Text(
                 txt,
-                style: effectiveStyle
-                    ?.copyWith(decoration: TextDecoration.underline),
+                style: effectiveStyle?.copyWith(
+                    decoration: TextDecoration.underline),
                 textAlign: textAlign,
               ),
             ),
@@ -339,22 +350,17 @@ class CrewListUtils {
           );
         }
 
-        final rowCount = _calculateRowCount(
-          visibleCrew,
-          effectiveStyle,
-          context,
-          constraints.maxWidth,
-          startW,
-        );
-
-        return SizedBox(
-          height: rowCount.clamp(1, maxRows) * rowHeight,
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: maxRows * (rowHeight + 2), // +2 for runSpacing
+          ),
           child: Wrap(
             alignment: textAlign == TextAlign.center
                 ? WrapAlignment.center
                 : WrapAlignment.start,
             spacing: 4,
             runSpacing: 2,
+            clipBehavior: Clip.hardEdge,
             children: widgets,
           ),
         );
@@ -373,7 +379,7 @@ class CrewListUtils {
     double endW,
   ) {
     final visibleCount = _calculateVisibleCrewCount(
-      crew, style, context, maxWidth, maxRows, startW, endW);
+        crew, style, context, maxWidth, maxRows, startW, endW);
     return crew.take(visibleCount).toList();
   }
 
@@ -391,7 +397,8 @@ class CrewListUtils {
     for (int i = 0; i < crew.length; i++) {
       final isLast = i == crew.length - 1;
       final txt = isLast ? crew[i].name : '${crew[i].name},';
-      final w = _calculateTextWidth(TextSpan(text: txt, style: style), context) + 4;
+      final w =
+          _calculateTextWidth(TextSpan(text: txt, style: style), context) + 4;
       if (rowW + w > maxWidth) {
         rows++;
         rowW = w;
