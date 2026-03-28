@@ -81,23 +81,25 @@ class MovieDetailsWidget extends StatelessWidget {
                 animateLocaleChanges: true,
                 maxLines: 2,
               ),
-              CrewListUtils.buildCrewList(
-                context: context,
-                crewMembers: film.crewMembers,
-                startText: 'dir.',
-                role: 'director',
-                maxRows: 1,
-                maxWidth: maxColumnWidth,
-                onCrewTapped: (member, role) => showCrewPopup(context, member, role, onFilmSelected),
-                onMoreTapped: () => showFilmPopup(context, film, onFilmSelected),
-              ),
-            
+              const SizedBox(height: 6),
+              if (film.crewMembers.any((member) => member.role.toLowerCase() == 'director'))
+                CrewListUtils.buildCrewList(
+                  context: context,
+                  crewMembers: film.crewMembers,
+                  startText: 'dir.',
+                  role: 'director',
+                  maxRows: 1,
+                  maxWidth: maxColumnWidth,
+                  onCrewTapped: (member, role) => showCrewPopup(context, member, role, onFilmSelected),
+                  onMoreTapped: () => showFilmPopup(context, film, onFilmSelected),
+                ),
               const SizedBox(height: 6),
               TagListUtils.buildTagList(context:context, 
                                         tags:film.genres, 
                                         ),
               const SizedBox(height: 6),
-               CrewListUtils.buildCrewList(
+              if (film.crewMembers.any((member) => member.role.toLowerCase() == 'actor'))
+                CrewListUtils.buildCrewList(
                 context: context,
                 crewMembers: film.crewMembers,
                 startText: 'Starring:',
@@ -106,8 +108,7 @@ class MovieDetailsWidget extends StatelessWidget {
                 maxWidth: maxColumnWidth,
                 onCrewTapped: (member, role) => showCrewPopup(context, member, role, onFilmSelected),
                 onMoreTapped: () => showFilmPopup(context, film, onFilmSelected),
-
-              ),
+                ),
               const SizedBox(height:6),
               RunTimeConverter.buildRuntimeText(
                 context: context,

@@ -38,7 +38,7 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
       appBar: AppBar(
         title: GestureDetector(
           onTap: _resetState,
-          child: const Text('siegf.org'),
+          child: const Text('siegfredsen.org'),
         ),
         actions: [
           IconButton(

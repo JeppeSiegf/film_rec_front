@@ -11,7 +11,7 @@ class MovieImageUtils {
  static String proxyWrap(String url) {
   const base = String.fromEnvironment(
     'PROXY_URL',
-    defaultValue: 'https://www.siegf.org/proxy'
+    defaultValue: 'https://www.siegfredsen.org/proxy'
   );
   return '$base?url=${Uri.encodeComponent(url)}';
 }
