@@ -33,10 +33,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         final query = controller.text.trim();
         if (query.isEmpty) return [];
 
-        // Hent forslag baseret på den aktuelle query
         final results = await widget.repository.searchFilms(query);
 
-        // Returnér straks ListTile-forslagene
         return results.map((film) {
           return ListTile(
             title: Text(film.title),

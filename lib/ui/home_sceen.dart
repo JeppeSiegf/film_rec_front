@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:film_rec_front/data/api_service.dart';
 import 'package:film_rec_front/data/models.dart';
 import 'package:film_rec_front/state/app_state.dart';
@@ -10,6 +9,7 @@ import 'package:film_rec_front/ui/rec_grid.dart';
 import 'package:film_rec_front/ui/search_bar.dart';
 import 'package:film_rec_front/utils/poster_diplay.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -31,14 +31,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final AppState _appState = AppState();
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
-          onTap: _resetState,
-          child: const Text('siegfredsen.org'),
+          onTap: () => context.go('/'),
+          child: const Text('siegfredsen.org')
+          
+
         ),
         actions: [
           IconButton(
@@ -64,46 +66,31 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(onPressed: null, icon: Icon(Icons.info))
         ],
       ),
-     body: Center(
-  child: Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      //  const Text("Jeppe Siegfredsen personal website", style: TextStyle(fontSize: 24, fontWeight: FontWeight.normal)),
-      // const SizedBox(height: 60),
-      ResponsiveImage(imagePath: 'lib/assets/constanza.gif'),
-      const SizedBox(height: 60), 
-      const Text("Film Anbefalinger", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 20), 
-      ElevatedButton(
-        onPressed: () {
-          // Navigate to the Film page
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FilmRecommenderScreen(
-                 toggleTheme: widget.toggleTheme,
-                toggleLocale: widget.toggleLocale,
-                currentTheme: ThemeManager.themeMode,
-                currentLocale: LocalizationManager.locale,
-              ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            //  const Text("Jeppe Siegfredsen personal website", style: TextStyle(fontSize: 24, fontWeight: FontWeight.normal)),
+            // const SizedBox(height: 60),
+            ResponsiveImage(imagePath: 'lib/assets/constanza.gif'),
+            const SizedBox(height: 60),
+            const Text("Film Anbefalinger",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+           ElevatedButton(
+            onPressed: () {
+              context.go('/film');
+            },
+            child: const Icon(Icons.movie),
             ),
-          );
-        },
-        
-        child: const Icon(Icons.movie),
+                      
+          ],
+        ),
       ),
-    ],
-  ),
-    ),
-    ); 
+    );
   }
 
-
-
-  
-
   void _resetState() {
-      
     setState(() {
       _appState.selectedFilm = null;
       _appState.recommendations = [];
