@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
            ElevatedButton(
             onPressed: () {
-              context.go('/film');
+              context.go('/rec');
             },
             child: const Icon(Icons.movie),
             ),
