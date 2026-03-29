@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:film_rec_front/data/api_service.dart';
 import 'package:film_rec_front/data/models.dart';
 import 'package:film_rec_front/state/app_state.dart';
@@ -88,7 +87,7 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
                       onFilmSelected: _handleFilmSelected,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   if (_appState.selectedFilm != null) ...[
                     MovieDetailsWidget(
                       film: _appState.selectedFilm!,

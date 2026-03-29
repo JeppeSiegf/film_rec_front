@@ -40,7 +40,8 @@ class RecommendationsGrid extends StatelessWidget {
       final spacing = idealSpacing * scaleFactor;
       
       // Total cell height
-      final totalCellHeight = posterHeight + spacing + titleHeight;
+      const double fixedTitleHeight = 52.0;
+      final totalCellHeight = posterHeight + spacing + fixedTitleHeight;
       final childAspectRatio = cellWidth / totalCellHeight;
 
       return GridView.builder(
@@ -127,22 +128,20 @@ class FilmGridItem extends StatelessWidget {
             ),
           ),
           SizedBox(height: spacing),
-          SizedBox(
-            width: safePosterWidth,
-            height: titleHeight,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: MovieTextUtils.buildMovieTitle(
-                film: film,
-                context: context,
-                includeYear: false,
-                textAlign: TextAlign.center,
-                animateLocaleChanges: true,
-                maxLines: 2,
-                titleStyle: titleStyle,
-              ),
+          Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: MovieTextUtils.buildMovieTitle(
+              film: film,
+              context: context,
+              includeYear: false,
+              textAlign: TextAlign.center,
+              animateLocaleChanges: true,
+              maxLines: 2,
+              titleStyle: titleStyle,
             ),
           ),
+        ),
         ],
       ),
     );
