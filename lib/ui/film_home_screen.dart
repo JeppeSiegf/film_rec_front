@@ -82,7 +82,12 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                 
+                  Center(
+                    child: SearchBarWidget(
+                      repository: _movieRepository,
+                      onFilmSelected: _handleFilmSelected,
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   if (_appState.selectedFilm != null) ...[
                     MovieDetailsWidget(
@@ -149,12 +154,6 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
                       ),
                     ),
                 ],
-                 Center(
-                    child: SearchBarWidget(
-                      repository: _movieRepository,
-                      onFilmSelected: _handleFilmSelected,
-                    ),
-                  ),
                 ]));
       },
     );
