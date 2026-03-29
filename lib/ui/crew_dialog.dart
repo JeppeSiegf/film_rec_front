@@ -46,7 +46,7 @@ class CrewPopupContent extends StatefulWidget {
   @override
   _CrewPopupContentState createState() => _CrewPopupContentState();
 }
-
+                     
 class _CrewPopupContentState extends State<CrewPopupContent> {
   late Future<List<Film>> _filmFuture;
   Set<String> _availableRoles = {};
@@ -179,7 +179,6 @@ class _CrewPopupContentState extends State<CrewPopupContent> {
       case "Release Year":
         films.sort((a, b) => b.releaseYear.compareTo(a.releaseYear));
         break;
-      
       case "Popularity":
       default:
         films.sort((a, b) => b.popularity.compareTo(a.popularity));

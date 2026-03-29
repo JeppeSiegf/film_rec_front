@@ -70,8 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Personal Site of Jeppe Siegfredsen", style: TextStyle(fontSize: 24, fontWeight: FontWeight.normal)),
-            const SizedBox(height: 40),
+            //const Text("Personal Site of Jeppe Siegfredsen", style: TextStyle(fontSize: 24, fontWeight: FontWeight.normal)),
+            //const SizedBox(height: 40),
             ResponsiveImage(imagePath: 'lib/assets/constanza.gif'),
             const SizedBox(height: 60),
             const Text("Film Anbefalinger",

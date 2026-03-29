@@ -7,20 +7,15 @@ import 'package:url_strategy/url_strategy.dart';
 
 Future<void> main() async {
   setPathUrlStrategy();
-  runApp(const MyApp());
-  
+  runApp(const MyApp()); 
 }
-
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-  
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
-
 
 class _MyAppState extends State<MyApp> {
   void _toggleTheme() {
@@ -40,13 +35,21 @@ class _MyAppState extends State<MyApp> {
       routes: [
         GoRoute(
           path: '/',
-          pageBuilder: (context, state) => NoTransitionPage(
+          pageBuilder: (context, state) => CustomTransitionPage(
             child: HomeScreen(
               toggleTheme: _toggleTheme,
               toggleLocale: _toggleLocale,
               currentTheme: ThemeManager.themeMode,
               currentLocale: LocalizationManager.locale,
             ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                 opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
           ),
         ),
         GoRoute(
@@ -60,13 +63,8 @@ class _MyAppState extends State<MyApp> {
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
-              const begin = Offset(1.0, 0.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
-              final tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-              return SlideTransition(
-                position: animation.drive(tween),
+                return FadeTransition(
+                 opacity: animation,
                 child: child,
               );
             },
