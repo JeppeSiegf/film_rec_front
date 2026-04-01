@@ -8,10 +8,8 @@ class ApiService {
   
   final String apiUrl;
 
-  ApiService()
-      : apiUrl = const String.fromEnvironment(
-            'API_BASE_URL',
-            defaultValue: 'https://filmrec-production.up.railway.app');
+   ApiService()
+      : apiUrl = const String.fromEnvironment('API_BASE_URL'); 
 
   // This method connects to the Flask search endpoint
   Future<List<SearchResult>> searchFilms(String query) async {

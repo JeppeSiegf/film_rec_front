@@ -10,4 +10,4 @@ flutter config --enable-web
 
 # Get dependencies and build web
 flutter pub get
-flutter build web --release
+flutter build web --release --dart-define=API_BASE_URL=$API_BASE_URL
