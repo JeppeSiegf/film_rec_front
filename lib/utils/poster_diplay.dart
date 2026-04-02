@@ -136,7 +136,7 @@ class FilmBannerImage extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [Colors.white, Colors.transparent],
-          stops: [0.55, 0.95],
+          stops: [0.55, 1.0],
         ).createShader(bounds);
       },
       blendMode: BlendMode.dstIn,
