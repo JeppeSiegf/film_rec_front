@@ -97,7 +97,6 @@ class _MyAppState extends State<MyApp> {
       darkTheme: ThemeData.dark(),
       themeMode: ThemeManager.themeMode,
       locale: LocalizationManager.locale,
-      supportedLocales: const [Locale('local'), Locale('global')]
     );
   }
 }
