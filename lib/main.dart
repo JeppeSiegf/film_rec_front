@@ -16,71 +16,77 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
-class _MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeManager.themeMode;
-  Locale _locale = LocalizationManager.locale;
 
+class _MyAppState extends State<MyApp> {
   void _toggleTheme() {
     setState(() {
       ThemeManager.toggleTheme();
-      _themeMode = ThemeManager.themeMode;
     });
   }
 
   void _toggleLocale() {
     setState(() {
       LocalizationManager.toggleLocale();
-      _locale = LocalizationManager.locale;
     });
   }
 
   late final GoRouter _router = GoRouter(
-    initialLocation: '/',
-    routes: [
-      GoRoute(
-        path: '/',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          child: HomeScreen(
-            toggleTheme: _toggleTheme,
-            toggleLocale: _toggleLocale,
-            currentTheme: _themeMode,
-            currentLocale: _locale,
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            child: HomeScreen(
+              toggleTheme: _toggleTheme,
+              toggleLocale: _toggleLocale,
+              currentTheme: ThemeManager.themeMode,
+              currentLocale: LocalizationManager.locale,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                 opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
           ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-              FadeTransition(opacity: animation, child: child),
-          transitionDuration: const Duration(milliseconds: 300),
         ),
-      ),
-      GoRoute(
-        path: '/rec',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          child: FilmRecommenderScreen(
-            toggleTheme: _toggleTheme,
-            toggleLocale: _toggleLocale,
-            currentTheme: _themeMode,
-            currentLocale: _locale,
+        GoRoute(
+          path: '/rec',
+          pageBuilder: (context, state) => CustomTransitionPage(
+            child: FilmRecommenderScreen(
+              toggleTheme: _toggleTheme,
+              toggleLocale: _toggleLocale,
+              currentTheme: ThemeManager.themeMode,
+              currentLocale: LocalizationManager.locale,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                 opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 300),
           ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-              FadeTransition(opacity: animation, child: child),
-          transitionDuration: const Duration(milliseconds: 300),
         ),
-      ),
-    ],
-    errorPageBuilder: (context, state) => NoTransitionPage(
-      child: Scaffold(
-        body: Center(
-          child: Column(
+      ],
+      errorPageBuilder: (context, state) => NoTransitionPage(
+              child: Scaffold(
+                  body: Center(
+                      child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.sentiment_very_dissatisfied_sharp, size: 128, color: Theme.of(context).disabledColor),
+              Icon(
+                Icons.sentiment_very_dissatisfied_sharp,
+                size: 128,
+                color: Theme.of(context).disabledColor,
+              ),
               const SizedBox(height: 10),
-              const Text('404 – Page not found'),
+              Text('404 – Page not found'),
             ],
-          ),
-        ),
-      ),
-    ),
-  );
+          )))));
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +95,8 @@ class _MyAppState extends State<MyApp> {
       routerConfig: _router,
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      themeMode: _themeMode,
-      locale: _locale,
+      themeMode: ThemeManager.themeMode,
+      locale: LocalizationManager.locale,
     );
   }
 }

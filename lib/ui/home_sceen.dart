@@ -45,12 +45,12 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(
-              widget.currentLocale.languageCode == 'local'
+              LocalizationManager.locale.languageCode == 'local'
                   ? Icons.translate_rounded
                   : Icons.translate,
             ),
-            onPressed: widget.toggleLocale,
-            tooltip: widget.currentLocale.languageCode == 'local'
+            onPressed: () => setState(() => widget.toggleLocale()),
+            tooltip: LocalizationManager.locale.languageCode == 'local'
                 ? 'Globalize'
                 : 'Localize',
           ),

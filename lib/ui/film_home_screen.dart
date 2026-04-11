@@ -43,12 +43,12 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
         actions: [
           IconButton(
             icon: Icon(
-              widget.currentLocale.languageCode == 'local'
+              LocalizationManager.locale.languageCode == 'local'
                   ? Icons.translate_rounded
                   : Icons.translate,
             ),
-            onPressed: widget.toggleLocale,
-            tooltip: widget.currentLocale.languageCode == 'local'
+            onPressed: () => setState(() => widget.toggleLocale()),
+            tooltip: LocalizationManager.locale.languageCode == 'local'
                 ? 'Globalize'
                 : 'Localize',
           ),
@@ -56,7 +56,7 @@ class _FilmRecommenderScreenState extends State<FilmRecommenderScreen> {
             icon: Icon(widget.currentTheme == ThemeMode.dark
                 ? Icons.wb_sunny
                 : Icons.nightlight),
-            onPressed: widget.toggleTheme,
+            onPressed: () => setState(() => widget.toggleTheme()),
             tooltip: widget.currentTheme == ThemeMode.dark
                 ? 'Light Mode'
                 : 'Dark Mode',
