@@ -18,6 +18,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  
+  
   void _toggleTheme() {
     setState(() {
       ThemeManager.toggleTheme();
@@ -30,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  late final GoRouter _router = GoRouter(
+  GoRouter get _router => GoRouter(
       initialLocation: '/',
       routes: [
         GoRoute(
