@@ -18,8 +18,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  
-  
   void _toggleTheme() {
     setState(() {
       ThemeManager.toggleTheme();
@@ -32,7 +30,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  GoRouter get _router => GoRouter(
+  late final GoRouter _router = GoRouter(
       initialLocation: '/',
       routes: [
         GoRoute(
@@ -42,7 +40,7 @@ class _MyAppState extends State<MyApp> {
               toggleTheme: _toggleTheme,
               toggleLocale: _toggleLocale,
               currentTheme: ThemeManager.themeMode,
-              currentLocale: LocalizationManager.locale,
+              currentLocale: LocalizationManager.locale
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -99,6 +97,7 @@ class _MyAppState extends State<MyApp> {
       darkTheme: ThemeData.dark(),
       themeMode: ThemeManager.themeMode,
       locale: LocalizationManager.locale,
+      supportedLocales: const [Locale('local'), Locale('global')]
     );
   }
 }
